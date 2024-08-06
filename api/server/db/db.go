@@ -11,7 +11,7 @@ import (
 )
 
 func InitDB(cfg *config.DBConfig) *sql.DB {
-	dataSourceName := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s??charset=utf8&parseTime=True&loc=Local",
+	dataSourceName := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8&parseTime=True&loc=Local",
 		cfg.User,
 		cfg.Password,
 		cfg.Host,

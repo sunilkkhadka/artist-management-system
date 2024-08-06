@@ -1,18 +1,17 @@
-version: "3.8"
+version: "3.7"
 services:
-  mysql:
+  artist_database:
     container_name: artist_db
-    image: mysql:8.0
+    image: mysql:latest
     ports:
-      - "3360:3360"
+      - 3307:3306
     environment:
-      - MYSQL_ROOT_HOST=%
       - MYSQL_USER=${DB_USER}
       - MYSQL_PASSWORD=${DB_PASSWORD}
       - MYSQL_DATABASE=${DB_NAME}
       - MYSQL_ROOT_PASSWORD=${DB_PASSWORD}
     volumes:
-      - database_mysql:/var/lib/mysql
+      - artist_data:/var/lib/mysql
 
 volumes:
-  database_mysql:
+  artist_data:
