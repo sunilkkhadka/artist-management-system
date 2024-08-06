@@ -8,6 +8,8 @@ require (
 	github.com/joho/godotenv v1.5.1
 )
 
+require github.com/asaskevich/govalidator v0.0.0-20230301143203-a9d515a09cc2 // indirect
+
 require (
 	filippo.io/edwards25519 v1.1.0 // indirect
 	github.com/bytedance/sonic v1.11.6 // indirect
@@ -16,6 +18,7 @@ require (
 	github.com/cloudwego/iasm v0.2.0 // indirect
 	github.com/gabriel-vasile/mimetype v1.4.3 // indirect
 	github.com/gin-contrib/sse v0.1.0 // indirect
+	github.com/go-ozzo/ozzo-validation v3.6.0+incompatible
 	github.com/go-playground/locales v0.14.1 // indirect
 	github.com/go-playground/universal-translator v0.18.1 // indirect
 	github.com/go-playground/validator/v10 v10.20.0 // indirect

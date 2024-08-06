@@ -12,7 +12,9 @@ CREATE TABLE `users` (
     `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP,
     `updated_at` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     `deleted_at` DATETIME NULL,
-    CHECK (deleted_at IS NULL OR deleted_at > created_at)
+    CHECK (deleted_at IS NULL OR deleted_at > created_at),
+    INDEX `idx_users_email` (`email`),
+    INDEX `idx_users_role` (`role`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 CREATE TABLE `artists` (
@@ -39,5 +41,6 @@ CREATE TABLE `musics` (
     `updated_at` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     `deleted_at` DATETIME NULL,
     FOREIGN KEY (`artist_id`) REFERENCES `artists` (`id`) ON DELETE SET NULL,
-    CHECK (deleted_at IS NULL OR deleted_at > created_at)
+    CHECK (deleted_at IS NULL OR deleted_at > created_at),
+    INDEX `idx_musics_artist_id` (`artist_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
