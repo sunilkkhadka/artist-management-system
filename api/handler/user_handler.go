@@ -67,7 +67,7 @@ func (handler *UserHandler) LoginHandler(ctx *gin.Context) {
 		return
 	}
 
-	ctx.SetCookie("refresh_token", refreshToken, 60*60*24*auth.JwtConf.JwtRefreshTime, "/", "localhost", false, true)
+	ctx.SetCookie(constants.REFRESH_TOKEN, refreshToken, 60*60*24*auth.JwtConf.JwtRefreshTime, "/", "localhost", false, true)
 
 	response.SuccessResponse(ctx, map[string]any{
 		"token": accessToken,
@@ -75,7 +75,7 @@ func (handler *UserHandler) LoginHandler(ctx *gin.Context) {
 }
 
 func (handler *UserHandler) Refresh(ctx *gin.Context) {
-	refreshToken, err := ctx.Cookie("refresh_token")
+	refreshToken, err := ctx.Cookie(constants.REFRESH_TOKEN)
 	if err != nil {
 		response.ErrorResponse(ctx, http.StatusUnauthorized, "Refresh token not found")
 		return
@@ -96,7 +96,7 @@ func (handler *UserHandler) Refresh(ctx *gin.Context) {
 		return
 	}
 
-	ctx.SetCookie("refresh_token", newRefreshToken, 60*60*24*auth.JwtConf.JwtRefreshTime, "/", "localhost", false, true)
+	ctx.SetCookie(constants.REFRESH_TOKEN, newRefreshToken, 60*60*24*auth.JwtConf.JwtRefreshTime, "/", "localhost", false, true)
 
 	response.SuccessResponse(ctx, map[string]any{
 		"token": accessToken,

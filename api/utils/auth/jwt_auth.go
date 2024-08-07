@@ -110,7 +110,3 @@ func ValidateToken(tokenStr string, secret []byte) (jwt.MapClaims, error) {
 
 	return claims, nil
 }
-
-func RefreshToken() {
-
-}
