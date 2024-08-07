@@ -2,6 +2,7 @@ package service
 
 import (
 	"errors"
+	"strings"
 	"time"
 
 	"github.com/sunilkkhadka/artist-management-system/model"
@@ -14,9 +15,11 @@ import (
 )
 
 type UserServiceI interface {
+	DeleteUserById(id int) error
 	GetBlacklistedTokenByToken(token string) error
 	LogoutUser(refreshToken string, expiresAt time.Time) error
 	LoginUser(req request.LoginRequest) (string, string, error)
+	UpdateUserById(id int, user request.UpdateUserRequest) error
 	GetAllUsers(limit, offset int) ([]response.UserResponse, error)
 	CreateUser(req request.RegisterUserRequest, en encryption.Encryptor) error
 }
@@ -74,7 +77,7 @@ func (service *UserService) LoginUser(req request.LoginRequest) (string, string,
 		return "", "", err
 	}
 
-	if user.ID == 0 {
+	if user.ID == 0 || user.DeletedAt.Valid {
 		return "", "", errors.New("user doesn't exist")
 	}
 
@@ -120,4 +123,89 @@ func (service *UserService) GetAllUsers(limit, offset int) ([]response.UserRespo
 	}
 
 	return users, nil
+}
+
+func (service *UserService) DeleteUserById(id int) error {
+	err := service.UserRepo.DeleteUserById(id)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (service *UserService) UpdateUserById(id int, user request.UpdateUserRequest) error {
+	currentUser, err := service.UserRepo.GetUserById(uint(id))
+	if err != nil {
+		return err
+	}
+
+	if currentUser.ID == 0 || currentUser.DeletedAt.Valid {
+		return errors.New("user doesn't exist")
+	}
+
+	var query []string
+	var args []interface{}
+
+	if user.Firstname != nil {
+		query = append(query, "first_name = ?")
+		args = append(args, *user.Firstname)
+	}
+
+	if user.Lastname != nil {
+		query = append(query, "last_name = ?")
+		args = append(args, *user.Lastname)
+	}
+
+	if user.Email != nil {
+		query = append(query, "email = ?")
+		args = append(args, *user.Email)
+	}
+
+	if user.Password != nil {
+		hashedPassword, err := bcrypt.GenerateFromPassword([]byte(*user.Password), bcrypt.DefaultCost)
+		if err != nil {
+			return err
+		}
+		query = append(query, "password = ?")
+		args = append(args, hashedPassword)
+	}
+
+	if user.Role != nil {
+		query = append(query, "role = ?")
+		args = append(args, *user.Role)
+	}
+
+	if user.Phone != nil {
+		query = append(query, "phone = ?")
+		args = append(args, *user.Phone)
+	}
+
+	if user.DateOfBirth != nil {
+		query = append(query, "dob = ?")
+		args = append(args, *user.DateOfBirth)
+	}
+
+	if user.Gender != nil {
+		query = append(query, "gender = ?")
+		args = append(args, *user.Gender)
+	}
+
+	if user.Address != nil {
+		query = append(query, "address = ?")
+		args = append(args, *user.Address)
+	}
+
+	query = append(query, "updated_at = ?")
+	args = append(args, user.UpdatedAt)
+
+	args = append(args, id)
+	finalQuery := strings.Join(query, ", ")
+
+	err = service.UserRepo.UpdateUserById(finalQuery, args)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

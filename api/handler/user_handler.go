@@ -77,7 +77,7 @@ func (handler *UserHandler) LoginHandler(ctx *gin.Context) {
 		"token": accessToken,
 	})
 
-	email.SendLoginEmail("visitor", loginRequest.Email, time.Now().Format("2006-01-02 15:04:05"), ctx.Request.UserAgent())
+	email.SendLoginEmail("User", loginRequest.Email, time.Now().Format("2006-01-02 15:04:05"), ctx.Request.UserAgent())
 }
 
 func (handler *UserHandler) RefreshHandler(ctx *gin.Context) {
@@ -164,4 +164,53 @@ func (handler *UserHandler) GetAllUsers(ctx *gin.Context) {
 	}
 
 	response.SuccessResponse(ctx, response.CreateUsersCollectionResponse(users))
+}
+
+func (handler *UserHandler) DeleteUserById(ctx *gin.Context) {
+
+	id := ctx.Param("id")
+	if id == "" {
+		response.ErrorResponse(ctx, http.StatusNotFound, "user id not found")
+		return
+	}
+
+	userId, err := strconv.Atoi(id)
+	if err != nil {
+		response.ErrorResponse(ctx, http.StatusNotFound, "couldn't convert id to a number")
+		return
+	}
+
+	if err := handler.UserService.DeleteUserById(userId); err != nil {
+		response.ErrorResponse(ctx, http.StatusBadGateway, "cannot delete user")
+		return
+	}
+
+	response.SuccessResponse(ctx, "User deleted successfully")
+}
+
+func (handler *UserHandler) UpdateUserById(ctx *gin.Context) {
+	var user request.UpdateUserRequest
+	if err := ctx.ShouldBindJSON(&user); err != nil {
+		response.ErrorResponse(ctx, http.StatusUnprocessableEntity, err.Error())
+		return
+	}
+
+	id := ctx.Param("id")
+	if id == "" {
+		response.ErrorResponse(ctx, http.StatusNotFound, "user id not found")
+		return
+	}
+
+	userId, err := strconv.Atoi(id)
+	if err != nil {
+		response.ErrorResponse(ctx, http.StatusNotFound, "couldn't convert id to a number")
+		return
+	}
+
+	if err := handler.UserService.UpdateUserById(userId, user); err != nil {
+		response.ErrorResponse(ctx, http.StatusBadGateway, err.Error())
+		return
+	}
+
+	response.SuccessResponse(ctx, "User updated successfully")
 }

@@ -17,6 +17,6 @@ type User struct {
 	Gender      string       `json:"gender"`
 	Address     string       `json:"address"`
 	CreatedAt   time.Time    `json:"created_at"`
-	UpdatedAt   time.Time    `json:"updated_at"`
+	UpdatedAt   sql.NullTime `json:"updated_at"`
 	DeletedAt   sql.NullTime `json:"deleted_at"`
 }
