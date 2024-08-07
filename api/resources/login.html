@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <p>Dear {{.Name}},</p>
+    <p>We wanted to inform you of a recent login to your account.</p>
+    <h3>Login Details:</h3>
+    <ul>
+      <li>Time: {{.Time}}</li>
+      <li>Device/Browser: {{.Device}}</li>
+    </ul>
+    <p>
+      If you recognize this activity, no further action is required. However, if
+      you believe this login is unauthorized, please contact our support team
+      immediately at {{.Email}}.
+    </p>
+    <p>
+      For your security, we recommend reviewing your account settings and
+      enabling two-factor authentication.
+    </p>
+    <p>Sincerely, Melodia</p>
+  </body>
+</html>
