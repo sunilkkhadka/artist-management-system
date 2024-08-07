@@ -10,7 +10,6 @@ import (
 
 	"github.com/golang-jwt/jwt"
 	"github.com/joho/godotenv"
-	"github.com/sunilkkhadka/artist-management-system/model"
 )
 
 type Claims struct {
@@ -25,7 +24,7 @@ type JwtEnvVars struct {
 	JwtExpirationTime int
 }
 
-var jwtConf JwtEnvVars
+var JwtConf JwtEnvVars
 
 func init() {
 	if err := godotenv.Load(); err != nil {
@@ -54,7 +53,7 @@ func LoadJwtEnv() error {
 		return fmt.Errorf("invalid JWT refresh time: %w", err)
 	}
 
-	jwtConf = JwtEnvVars{
+	JwtConf = JwtEnvVars{
 		JwtSecret:         []byte(secret),
 		JwtRefreshTime:    refreshTime,
 		JwtExpirationTime: expirationTime,
@@ -63,19 +62,51 @@ func LoadJwtEnv() error {
 	return nil
 }
 
-func GenerateToken(user model.User) (string, error) {
-	claims := jwt.MapClaims{
-		"user_id": user.ID,
-		"role":    user.Role,
-		"exp":     time.Now().Add(time.Minute * time.Duration(jwtConf.JwtExpirationTime)).Unix(),
+func GenerateToken(id uint, role string) (string, string, error) {
+	accessTokenClaims := jwt.MapClaims{
+		"user_id": id,
+		"role":    role,
+		"exp":     time.Now().Add(time.Minute * time.Duration(JwtConf.JwtExpirationTime)).Unix(),
 	}
 
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	refreshTokenClaims := jwt.MapClaims{
+		"user_id": id,
+		"role":    role,
+		"exp":     time.Now().Add(time.Hour * 24 * time.Duration(JwtConf.JwtRefreshTime)).Unix(),
+	}
 
-	accessToken, err := token.SignedString(jwtConf.JwtSecret)
+	accessToken := jwt.NewWithClaims(jwt.SigningMethodHS256, accessTokenClaims)
+	refreshToken := jwt.NewWithClaims(jwt.SigningMethodHS256, refreshTokenClaims)
+
+	accessTokenString, err := accessToken.SignedString(JwtConf.JwtSecret)
 	if err != nil {
-		return "", fmt.Errorf("error generating access token: %w", err)
+		return "", "", fmt.Errorf("error generating access token: %w", err)
 	}
 
-	return accessToken, nil
+	refreshTokenString, err := refreshToken.SignedString(JwtConf.JwtSecret)
+	if err != nil {
+		return "", "", fmt.Errorf("error generating refresh token: %w", err)
+	}
+
+	return accessTokenString, refreshTokenString, nil
+}
+
+func ValidateToken(tokenStr string, secret []byte) (jwt.MapClaims, error) {
+	token, err := jwt.Parse(tokenStr, func(token *jwt.Token) (interface{}, error) {
+		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, jwt.ErrSignatureInvalid
+		}
+		return secret, nil
+	})
+
+	if err != nil {
+		return nil, err
+	}
+
+	claims, ok := token.Claims.(jwt.MapClaims)
+	if !ok || !token.Valid {
+		return nil, errors.New("invalid token")
+	}
+
+	return claims, nil
 }
