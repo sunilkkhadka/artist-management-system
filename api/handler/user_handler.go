@@ -50,7 +50,6 @@ func (handler *UserHandler) RegisterUserHandler(context *gin.Context) {
 	response.SuccessResponse(context, "User registered successfully")
 
 	email.SendRegisterEmail(registerRequest.Firstname, registerRequest.Email)
-
 }
 
 func (handler *UserHandler) LoginHandler(ctx *gin.Context) {

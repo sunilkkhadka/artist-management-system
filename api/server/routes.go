@@ -5,18 +5,22 @@ import (
 	"github.com/sunilkkhadka/artist-management-system/middleware"
 	"github.com/sunilkkhadka/artist-management-system/repository"
 	"github.com/sunilkkhadka/artist-management-system/service"
+	"github.com/sunilkkhadka/artist-management-system/utils/constants"
 )
 
 func ConfigureRoutes(server *Server) {
 
 	// Repository
 	userRepo := repository.NewUserRepository(server.DB)
+	artistRepo := repository.NewArtistRepository(server.DB)
 
 	// Service
 	userService := service.NewUserService(userRepo)
+	artistService := service.NewArtistService(artistRepo)
 
 	// Handler
 	userHandler := handler.NewUserHandler(userService)
+	artistHandler := handler.NewArtistHandler(artistService)
 
 	// Routes
 	v1 := server.Gin.Group("/v1")
@@ -27,8 +31,12 @@ func ConfigureRoutes(server *Server) {
 
 	// Authenticated Routes
 	v1.Use(middleware.AuthMiddleware()).Use(middleware.ActivityLogs(server.DB))
-	v1.GET("/healthcheck", userHandler.HealthcheckHandler)
 	v1.GET("/users", userHandler.GetAllUsers)
-	v1.PATCH("/user/delete/:id", userHandler.DeleteUserById)
 	v1.PATCH("/user/:id", userHandler.UpdateUserById)
+	v1.PATCH("/user/delete/:id", userHandler.DeleteUserById)
+
+	v1.POST("/artist", middleware.RoleAccess(constants.ARTIST_MANAGER), artistHandler.CreateArtist)
+	v1.GET("/artists", middleware.RoleAccess(constants.SUPER_ADMIN, constants.ARTIST_MANAGER), artistHandler.GetAllArtists)
+
+	v1.GET("/healthcheck", userHandler.HealthcheckHandler)
 }
