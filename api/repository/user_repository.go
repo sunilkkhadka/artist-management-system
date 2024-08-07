@@ -57,7 +57,7 @@ func (repo *UserRepository) GetUserByEmail(email string) (*model.User, error) {
 func (repo *UserRepository) CreateUser(user *model.User) error {
 
 	if user.Role == "" {
-		user.Role = "super_admin"
+		user.Role = "artist"
 	}
 
 	stmt, err := repo.db.Prepare("INSERT INTO users (first_name, last_name, email, password_hash, role, phone, dob, gender, address, created_at, updated_at) VALUES (?,?,?,?,?,?,?,?,?,NOW(),NOW())")

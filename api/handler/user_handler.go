@@ -28,21 +28,44 @@ func (handler *UserHandler) HealthcheckHandler(context *gin.Context) {
 }
 
 func (handler *UserHandler) RegisterUserHandler(context *gin.Context) {
-	var registerUser request.RegisterUserRequest
-	if err := context.ShouldBindJSON(&registerUser); err != nil {
+	var registerRequest request.RegisterUserRequest
+	if err := context.ShouldBindJSON(&registerRequest); err != nil {
 		response.ErrorResponse(context, http.StatusUnprocessableEntity, "required fields are empty")
 		return
 	}
 
-	if err := registerUser.Validate(); err != nil {
+	if err := registerRequest.Validate(); err != nil {
 		response.ErrorResponse(context, http.StatusUnprocessableEntity, err.Error())
 		return
 	}
 
-	if err := handler.UserService.CreateUser(registerUser, encryption.NewBcryptEncoder(bcrypt.DefaultCost)); err != nil {
+	if err := handler.UserService.CreateUser(registerRequest, encryption.NewBcryptEncoder(bcrypt.DefaultCost)); err != nil {
 		response.ErrorResponse(context, http.StatusUnprocessableEntity, err.Error())
 		return
 	}
 
 	response.SuccessResponse(context, "User registered successfully")
+}
+
+func (handler *UserHandler) LoginHandler(ctx *gin.Context) {
+	var loginRequest request.LoginRequest
+	if err := ctx.ShouldBindJSON(&loginRequest); err != nil {
+		response.ErrorResponse(ctx, http.StatusUnprocessableEntity, "required fields are empty")
+		return
+	}
+
+	if err := loginRequest.Validate(); err != nil {
+		response.ErrorResponse(ctx, http.StatusUnprocessableEntity, err.Error())
+		return
+	}
+
+	token, err := handler.UserService.LoginUser(loginRequest)
+	if err != nil {
+		response.ErrorResponse(ctx, http.StatusNotFound, err.Error())
+		return
+	}
+
+	response.SuccessResponse(ctx, map[string]any{
+		"token": token,
+	})
 }
