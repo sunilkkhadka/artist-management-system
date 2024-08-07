@@ -2,6 +2,7 @@ package repository
 
 import (
 	"database/sql"
+	"errors"
 	"fmt"
 	"time"
 
@@ -9,8 +10,10 @@ import (
 )
 
 type UserRepositoryI interface {
-	GetUserByEmail(email string) (*model.User, error)
 	CreateUser(user *model.User) error
+	GetUserByEmail(email string) (*model.User, error)
+	Logout(refreshToken string, expiresAt time.Time) error
+	GetBlacklistedTokenByToken(token string, expiresAt *time.Time) error
 }
 
 type UserRepository struct {
@@ -77,6 +80,36 @@ func (repo *UserRepository) CreateUser(user *model.User) error {
 	}
 
 	user.ID = uint(lastInsertId)
+
+	return nil
+}
+
+func (repo *UserRepository) Logout(refreshToken string, expiresAt time.Time) error {
+	stmt, err := repo.db.Prepare("INSERT INTO blacklisted_tokens (token, expires_at) VALUES (?,?)")
+	if err != nil {
+		return err
+	}
+	defer stmt.Close()
+
+	_, err = stmt.Exec(refreshToken, expiresAt)
+	if err != nil {
+		return errors.New("cannot insert into the database")
+	}
+
+	return nil
+}
+
+func (repo *UserRepository) GetBlacklistedTokenByToken(token string, expiresAt *time.Time) error {
+	stmt, err := repo.db.Prepare("SELECT expires_at FROM blacklisted_tokens WHERE token = ?")
+	if err != nil {
+		return err
+	}
+	defer stmt.Close()
+
+	err = stmt.QueryRow(token).Scan(&expiresAt)
+	if err != nil {
+		return errors.New("token not found in the database")
+	}
 
 	return nil
 }

@@ -2,6 +2,7 @@ package handler
 
 import (
 	"net/http"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/sunilkkhadka/artist-management-system/request"
@@ -74,10 +75,16 @@ func (handler *UserHandler) LoginHandler(ctx *gin.Context) {
 	})
 }
 
-func (handler *UserHandler) Refresh(ctx *gin.Context) {
+func (handler *UserHandler) RefreshHandler(ctx *gin.Context) {
 	refreshToken, err := ctx.Cookie(constants.REFRESH_TOKEN)
 	if err != nil {
 		response.ErrorResponse(ctx, http.StatusUnauthorized, "Refresh token not found")
+		return
+	}
+
+	err = handler.UserService.GetBlacklistedTokenByToken(refreshToken)
+	if err != nil {
+		response.ErrorResponse(ctx, http.StatusUnauthorized, err.Error())
 		return
 	}
 
@@ -101,4 +108,29 @@ func (handler *UserHandler) Refresh(ctx *gin.Context) {
 	response.SuccessResponse(ctx, map[string]any{
 		"token": accessToken,
 	})
+}
+
+func (handler *UserHandler) LogoutHandler(ctx *gin.Context) {
+	refreshToken, err := ctx.Cookie(constants.REFRESH_TOKEN)
+	if err != nil {
+		response.ErrorResponse(ctx, http.StatusUnauthorized, "Refresh token not found")
+		return
+	}
+
+	claims, err := auth.ValidateToken(refreshToken, []byte(auth.JwtConf.JwtSecret))
+	if err != nil {
+		response.ErrorResponse(ctx, http.StatusUnauthorized, "Invalid refresh token")
+		return
+	}
+
+	expiryTime := int64(claims[constants.EXPIRES_AT].(float64))
+	err = handler.UserService.LogoutUser(refreshToken, time.Unix(expiryTime, 0))
+	if err != nil {
+		response.ErrorResponse(ctx, http.StatusUnauthorized, "Cannot logout")
+		return
+	}
+
+	ctx.SetCookie(constants.REFRESH_TOKEN, "", -1, "/", "localhost", false, true)
+
+	response.SuccessResponse(ctx, "Logged out successfully!")
 }
