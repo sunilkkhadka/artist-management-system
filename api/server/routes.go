@@ -22,4 +22,5 @@ func ConfigureRoutes(server *Server) {
 
 	v1.GET("/healthcheck", userHandler.HealthcheckHandler)
 	v1.POST("/register", userHandler.RegisterUserHandler)
+	v1.POST("/login", userHandler.LoginHandler)
 }

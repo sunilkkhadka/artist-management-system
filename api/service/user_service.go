@@ -1,16 +1,19 @@
 package service
 
 import (
-	"fmt"
+	"errors"
 
 	"github.com/sunilkkhadka/artist-management-system/model"
 	"github.com/sunilkkhadka/artist-management-system/repository"
 	"github.com/sunilkkhadka/artist-management-system/request"
+	"github.com/sunilkkhadka/artist-management-system/utils/auth"
 	"github.com/sunilkkhadka/artist-management-system/utils/encryption"
+	"golang.org/x/crypto/bcrypt"
 )
 
 type UserServiceI interface {
 	CreateUser(req request.RegisterUserRequest, en encryption.Encryptor) error
+	LoginUser(req request.LoginRequest) (string, error)
 }
 
 type UserService struct {
@@ -30,7 +33,7 @@ func (service UserService) CreateUser(req request.RegisterUserRequest, en encryp
 	}
 
 	if user.ID != 0 {
-		return fmt.Errorf("user already exists")
+		return errors.New("user already exists")
 	}
 
 	var encryptedPassword string
@@ -58,4 +61,26 @@ func (service UserService) CreateUser(req request.RegisterUserRequest, en encryp
 	}
 
 	return nil
+}
+
+func (service *UserService) LoginUser(req request.LoginRequest) (string, error) {
+	user, err := service.UserRepo.GetUserByEmail(req.Email)
+	if err != nil {
+		return "", err
+	}
+
+	if user.ID == 0 {
+		return "", errors.New("user doesn't exist")
+	}
+
+	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(req.Password)); err != nil {
+		return "", errors.New("password doesn't match")
+	}
+
+	accessToken, err := auth.GenerateToken(*user)
+	if err != nil {
+		return "", err
+	}
+
+	return accessToken, nil
 }
