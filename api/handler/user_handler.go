@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/sunilkkhadka/artist-management-system/email"
 	"github.com/sunilkkhadka/artist-management-system/request"
 	"github.com/sunilkkhadka/artist-management-system/response"
 	"github.com/sunilkkhadka/artist-management-system/service"
@@ -46,6 +47,9 @@ func (handler *UserHandler) RegisterUserHandler(context *gin.Context) {
 	}
 
 	response.SuccessResponse(context, "User registered successfully")
+
+	email.SendRegisterEmail(registerRequest.Firstname, registerRequest.Email)
+
 }
 
 func (handler *UserHandler) LoginHandler(ctx *gin.Context) {
@@ -71,6 +75,8 @@ func (handler *UserHandler) LoginHandler(ctx *gin.Context) {
 	response.SuccessResponse(ctx, map[string]any{
 		"token": accessToken,
 	})
+
+	email.SendLoginEmail("visitor", loginRequest.Email, time.Now().Format("2006-01-02 15:04:05"), ctx.Request.UserAgent())
 }
 
 func (handler *UserHandler) RefreshHandler(ctx *gin.Context) {
