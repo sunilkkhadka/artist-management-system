@@ -13,4 +13,5 @@ const (
 	USER_ID       = "user_id"
 	ROLE          = "role"
 	REFRESH_TOKEN = "refresh_token"
+	EXPIRES_AT    = "exp"
 )

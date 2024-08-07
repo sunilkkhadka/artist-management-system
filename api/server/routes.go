@@ -20,8 +20,9 @@ func ConfigureRoutes(server *Server) {
 
 	// Routes
 	v1 := server.Gin.Group("/v1")
-	v1.POST("/refresh", userHandler.Refresh)
 	v1.POST("/login", userHandler.LoginHandler)
+	v1.POST("/logout", userHandler.LogoutHandler)
+	v1.POST("/refresh", userHandler.RefreshHandler)
 	v1.POST("/register", userHandler.RegisterUserHandler)
 
 	// Authenticated Routes

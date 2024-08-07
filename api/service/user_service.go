@@ -2,6 +2,7 @@ package service
 
 import (
 	"errors"
+	"time"
 
 	"github.com/sunilkkhadka/artist-management-system/model"
 	"github.com/sunilkkhadka/artist-management-system/repository"
@@ -14,6 +15,8 @@ import (
 type UserServiceI interface {
 	CreateUser(req request.RegisterUserRequest, en encryption.Encryptor) error
 	LoginUser(req request.LoginRequest) (string, string, error)
+	LogoutUser(refreshToken string, expiresAt time.Time) error
+	GetBlacklistedTokenByToken(token string) error
 }
 
 type UserService struct {
@@ -83,4 +86,27 @@ func (service *UserService) LoginUser(req request.LoginRequest) (string, string,
 	}
 
 	return accessToken, refreshToken, nil
+}
+
+func (service *UserService) GetBlacklistedTokenByToken(token string) error {
+	var expiresAt time.Time
+	err := service.UserRepo.GetBlacklistedTokenByToken(token, &expiresAt)
+	if err != nil {
+		return err
+	}
+
+	if time.Now().Before(expiresAt) {
+		return errors.New("Refresh token is already expired")
+	}
+
+	return nil
+}
+
+func (service *UserService) LogoutUser(refreshToken string, expiresAt time.Time) error {
+	err := service.UserRepo.Logout(refreshToken, expiresAt)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

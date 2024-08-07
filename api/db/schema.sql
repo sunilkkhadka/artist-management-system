@@ -44,3 +44,8 @@ CREATE TABLE `musics` (
     CHECK (deleted_at IS NULL OR deleted_at > created_at),
     INDEX `idx_musics_artist_id` (`artist_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE `blacklisted_tokens` (
+    token VARCHAR(255) PRIMARY KEY,
+    expires_at DATETIME NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
