@@ -11,10 +11,13 @@ import (
 )
 
 type UserRepositoryI interface {
+	DeleteUserById(id int) error
 	CreateUser(user *model.User) error
-	GetAllUsers(limit, offset int) ([]response.UserResponse, error)
+	GetUserById(id uint) (*model.User, error)
 	GetUserByEmail(email string) (*model.User, error)
+	UpdateUserById(query string, args []interface{}) error
 	Logout(refreshToken string, expiresAt time.Time) error
+	GetAllUsers(limit, offset int) ([]response.UserResponse, error)
 	GetBlacklistedTokenByToken(token string, expiresAt *time.Time) error
 }
 
@@ -30,7 +33,7 @@ func NewUserRepository(db *sql.DB) UserRepositoryI {
 
 func (repo *UserRepository) GetUserByEmail(email string) (*model.User, error) {
 	var user model.User
-	stmt, err := repo.db.Prepare("SELECT * FROM users WHERE email = ?")
+	stmt, err := repo.db.Prepare("SELECT * FROM users WHERE email = ? AND deleted_at IS NULL")
 	if err != nil {
 		return nil, fmt.Errorf("failed to prepare statement: %w", err)
 	}
@@ -54,6 +57,37 @@ func (repo *UserRepository) GetUserByEmail(email string) (*model.User, error) {
 
 	if err != nil && err != sql.ErrNoRows {
 		return &model.User{}, fmt.Errorf("couldn't scan user")
+	}
+
+	return &user, nil
+}
+
+func (repo *UserRepository) GetUserById(id uint) (*model.User, error) {
+	var user model.User
+	stmt, err := repo.db.Prepare("SELECT * FROM users WHERE id = ? AND deleted_at IS NULL")
+	if err != nil {
+		return nil, fmt.Errorf("failed to prepare statement: %w", err)
+	}
+	defer stmt.Close()
+
+	err = stmt.QueryRow(id).Scan(
+		&user.ID,
+		&user.Firstname,
+		&user.Lastname,
+		&user.Email,
+		&user.Password,
+		&user.Role,
+		&user.Phone,
+		&user.DateOfBirth,
+		&user.Gender,
+		&user.Address,
+		&user.CreatedAt,
+		&user.UpdatedAt,
+		&user.DeletedAt,
+	)
+
+	if err != nil && err != sql.ErrNoRows {
+		return &model.User{}, fmt.Errorf("couldn't scan user: %v", err)
 	}
 
 	return &user, nil
@@ -117,7 +151,7 @@ func (repo *UserRepository) GetBlacklistedTokenByToken(token string, expiresAt *
 }
 
 func (repo *UserRepository) GetAllUsers(limit, offset int) ([]response.UserResponse, error) {
-	stmt, err := repo.db.Prepare("SELECT * FROM users LIMIT ? OFFSET ?")
+	stmt, err := repo.db.Prepare("SELECT * FROM users WHERE deleted_at IS NULL LIMIT ? OFFSET ?")
 	if err != nil {
 		return nil, fmt.Errorf("couldn't prepare statement to get all users: %v", err)
 	}
@@ -138,4 +172,32 @@ func (repo *UserRepository) GetAllUsers(limit, offset int) ([]response.UserRespo
 	}
 
 	return users, nil
+}
+
+func (repo *UserRepository) DeleteUserById(id int) error {
+	stmt, err := repo.db.Prepare("UPDATE users SET deleted_at = NOW() WHERE id = ?")
+	if err != nil {
+		return fmt.Errorf("couldn't prepare statement to delete user: %v", err)
+	}
+
+	_, err = stmt.Exec(id)
+	if err != nil {
+		return fmt.Errorf("couldn't delete user: %v", err)
+	}
+
+	return nil
+}
+
+func (repo *UserRepository) UpdateUserById(query string, args []interface{}) error {
+	stmt, err := repo.db.Prepare("UPDATE users SET " + query + " WHERE id = ?")
+	if err != nil {
+		return fmt.Errorf("couldn't prepare statement to update the user: %v", err)
+	}
+
+	_, err = stmt.Exec(args...)
+	if err != nil {
+		return fmt.Errorf("couldn't update user: %v", err)
+	}
+
+	return nil
 }

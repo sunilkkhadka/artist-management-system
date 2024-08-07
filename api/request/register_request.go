@@ -7,6 +7,19 @@ import (
 	"github.com/go-ozzo/ozzo-validation/is"
 )
 
+type UpdateUserRequest struct {
+	Email       *string    `json:"email"`
+	Password    *string    `json:"password"`
+	Firstname   *string    `json:"first_name"`
+	Lastname    *string    `json:"last_name"`
+	Role        *string    `json:"role"`
+	Phone       *uint      `json:"phone"`
+	DateOfBirth *time.Time `json:"dob"`
+	Gender      *string    `json:"gender"`
+	Address     *string    `json:"address"`
+	UpdatedAt   *time.Time `json:"updated_at"`
+}
+
 type RegisterUserRequest struct {
 	Email       string    `json:"email" binding:"required" example:"example@gmail.com"`
 	Password    string    `json:"password" binding:"required"`

@@ -29,4 +29,6 @@ func ConfigureRoutes(server *Server) {
 	v1.Use(middleware.AuthMiddleware()).Use(middleware.ActivityLogs(server.DB))
 	v1.GET("/healthcheck", userHandler.HealthcheckHandler)
 	v1.GET("/users", userHandler.GetAllUsers)
+	v1.PATCH("/user/delete/:id", userHandler.DeleteUserById)
+	v1.PATCH("/user/:id", userHandler.UpdateUserById)
 }
