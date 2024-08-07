@@ -28,4 +28,5 @@ func ConfigureRoutes(server *Server) {
 	// Authenticated Routes
 	v1.Use(middleware.AuthMiddleware()).Use(middleware.ActivityLogs(server.DB))
 	v1.GET("/healthcheck", userHandler.HealthcheckHandler)
+	v1.GET("/users", userHandler.GetAllUsers)
 }
