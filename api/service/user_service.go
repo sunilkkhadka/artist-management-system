@@ -13,7 +13,7 @@ import (
 
 type UserServiceI interface {
 	CreateUser(req request.RegisterUserRequest, en encryption.Encryptor) error
-	LoginUser(req request.LoginRequest) (string, error)
+	LoginUser(req request.LoginRequest) (string, string, error)
 }
 
 type UserService struct {
@@ -63,24 +63,24 @@ func (service UserService) CreateUser(req request.RegisterUserRequest, en encryp
 	return nil
 }
 
-func (service *UserService) LoginUser(req request.LoginRequest) (string, error) {
+func (service *UserService) LoginUser(req request.LoginRequest) (string, string, error) {
 	user, err := service.UserRepo.GetUserByEmail(req.Email)
 	if err != nil {
-		return "", err
+		return "", "", err
 	}
 
 	if user.ID == 0 {
-		return "", errors.New("user doesn't exist")
+		return "", "", errors.New("user doesn't exist")
 	}
 
 	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(req.Password)); err != nil {
-		return "", errors.New("password doesn't match")
+		return "", "", errors.New("password doesn't match")
 	}
 
-	accessToken, err := auth.GenerateToken(*user)
+	accessToken, refreshToken, err := auth.GenerateToken(user.ID, user.Role)
 	if err != nil {
-		return "", err
+		return "", "", err
 	}
 
-	return accessToken, nil
+	return accessToken, refreshToken, nil
 }

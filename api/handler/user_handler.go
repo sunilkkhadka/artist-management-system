@@ -7,6 +7,8 @@ import (
 	"github.com/sunilkkhadka/artist-management-system/request"
 	"github.com/sunilkkhadka/artist-management-system/response"
 	"github.com/sunilkkhadka/artist-management-system/service"
+	"github.com/sunilkkhadka/artist-management-system/utils/auth"
+	"github.com/sunilkkhadka/artist-management-system/utils/constants"
 	"github.com/sunilkkhadka/artist-management-system/utils/encryption"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -59,13 +61,44 @@ func (handler *UserHandler) LoginHandler(ctx *gin.Context) {
 		return
 	}
 
-	token, err := handler.UserService.LoginUser(loginRequest)
+	accessToken, refreshToken, err := handler.UserService.LoginUser(loginRequest)
 	if err != nil {
 		response.ErrorResponse(ctx, http.StatusNotFound, err.Error())
 		return
 	}
 
+	ctx.SetCookie("refresh_token", refreshToken, 60*60*24*auth.JwtConf.JwtRefreshTime, "/", "localhost", false, true)
+
 	response.SuccessResponse(ctx, map[string]any{
-		"token": token,
+		"token": accessToken,
+	})
+}
+
+func (handler *UserHandler) Refresh(ctx *gin.Context) {
+	refreshToken, err := ctx.Cookie("refresh_token")
+	if err != nil {
+		response.ErrorResponse(ctx, http.StatusUnauthorized, "Refresh token not found")
+		return
+	}
+
+	claims, err := auth.ValidateToken(refreshToken, []byte(auth.JwtConf.JwtSecret))
+	if err != nil {
+		response.ErrorResponse(ctx, http.StatusUnauthorized, "Invalid refresh token")
+		return
+	}
+
+	userId := claims[constants.USER_ID].(float64)
+	userRole := claims[constants.ROLE].(string)
+
+	accessToken, newRefreshToken, err := auth.GenerateToken(uint(userId), userRole)
+	if err != nil {
+		response.ErrorResponse(ctx, http.StatusInternalServerError, "Failed to generate token")
+		return
+	}
+
+	ctx.SetCookie("refresh_token", newRefreshToken, 60*60*24*auth.JwtConf.JwtRefreshTime, "/", "localhost", false, true)
+
+	response.SuccessResponse(ctx, map[string]any{
+		"token": accessToken,
 	})
 }
