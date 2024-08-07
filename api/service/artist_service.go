@@ -1,6 +1,8 @@
 package service
 
 import (
+	"errors"
+	"strings"
 	"time"
 
 	"github.com/sunilkkhadka/artist-management-system/model"
@@ -10,7 +12,9 @@ import (
 )
 
 type ArtistServiceI interface {
+	DeleteArtistById(id int) error
 	CreateArtist(artist request.CreateArtistRequest) error
+	UpdateArtistById(id int, artist request.UpdateArtistRequest) error
 	GetAllArtists(limit, offset int) ([]response.ArtistResponse, error)
 }
 
@@ -44,6 +48,72 @@ func (service *ArtistService) CreateArtist(artist request.CreateArtistRequest) e
 	}
 
 	err := service.ArtistRepo.CreateArtist(newArtist)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (service *ArtistService) DeleteArtistById(id int) error {
+	err := service.ArtistRepo.DeleteArtistById(id)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (service *ArtistService) UpdateArtistById(id int, artist request.UpdateArtistRequest) error {
+	currentArtist, err := service.ArtistRepo.GetArtistById(uint(id))
+	if err != nil {
+		return err
+	}
+
+	if currentArtist.ID == 0 || currentArtist.DeletedAt.Valid {
+		return errors.New("artist doesn't exist")
+	}
+
+	var query []string
+	var args []interface{}
+
+	if artist.Name != nil {
+		query = append(query, "name = ?")
+		args = append(args, *artist.Name)
+	}
+
+	if artist.DateOfBirth != nil {
+		query = append(query, "dob = ?")
+		args = append(args, *artist.DateOfBirth)
+	}
+
+	if artist.Gender != nil {
+		query = append(query, "gender = ?")
+		args = append(args, *&artist.Gender)
+	}
+
+	if artist.Address != nil {
+		query = append(query, "address = ?")
+		args = append(args, *artist.Address)
+	}
+
+	if artist.FirstYearRelease != nil {
+		query = append(query, "first_year_release = ?")
+		args = append(args, *artist.FirstYearRelease)
+	}
+
+	if artist.NumberOfAlbumsReleased != nil {
+		query = append(query, "no_of_albums_released = ?")
+		args = append(args, *artist.NumberOfAlbumsReleased)
+	}
+
+	query = append(query, "updated_at = ?")
+	args = append(args, artist.UpdatedAt)
+
+	args = append(args, id)
+	finalQuery := strings.Join(query, ", ")
+
+	err = service.ArtistRepo.UpdateArtistById(finalQuery, args)
 	if err != nil {
 		return err
 	}
