@@ -20,12 +20,12 @@ func ConfigureRoutes(server *Server) {
 
 	// Routes
 	v1 := server.Gin.Group("/v1")
-	v1.POST("/login", userHandler.LoginHandler)
-	v1.POST("/logout", userHandler.LogoutHandler)
-	v1.POST("/refresh", userHandler.RefreshHandler)
-	v1.POST("/register", userHandler.RegisterUserHandler)
+	v1.POST("/login", middleware.ActivityLogs(server.DB), userHandler.LoginHandler)
+	v1.POST("/logout", middleware.ActivityLogs(server.DB), userHandler.LogoutHandler)
+	v1.POST("/refresh", middleware.ActivityLogs(server.DB), userHandler.RefreshHandler)
+	v1.POST("/register", middleware.ActivityLogs(server.DB), userHandler.RegisterUserHandler)
 
 	// Authenticated Routes
-	v1.Use(middleware.AuthMiddleware())
+	v1.Use(middleware.AuthMiddleware()).Use(middleware.ActivityLogs(server.DB))
 	v1.GET("/healthcheck", userHandler.HealthcheckHandler)
 }

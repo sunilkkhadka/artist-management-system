@@ -46,6 +46,20 @@ CREATE TABLE `musics` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE `blacklisted_tokens` (
-    token VARCHAR(255) PRIMARY KEY,
-    expires_at DATETIME NOT NULL
+    `token` VARCHAR(255) PRIMARY KEY,
+    `expires_at` DATETIME NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE `activitylogs` (
+  `id` INT(10) unsigned NOT NULL AUTO_INCREMENT,
+  `user_id` INT(10) unsigned,
+  `url` VARCHAR(255),
+  `action` VARCHAR(20),
+  `status` VARCHAR(20),
+  `request_data` TEXT,
+  `response_data` TEXT,
+  `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `deleted_at` DATETIME NULL,
+    PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
