@@ -9,8 +9,11 @@ import (
 )
 
 type ArtistRepositoryI interface {
-	GetAllArtists(limit, offset int) ([]response.ArtistResponse, error)
+	DeleteArtistById(id int) error
 	CreateArtist(artist model.Artist) error
+	GetArtistById(id uint) (*model.Artist, error)
+	UpdateArtistById(query string, args []interface{}) error
+	GetAllArtists(limit, offset int) ([]response.ArtistResponse, error)
 }
 
 type ArtistRepository struct {
@@ -56,6 +59,62 @@ func (repo *ArtistRepository) CreateArtist(artist model.Artist) error {
 	_, err = stmt.Exec(artist.Name, artist.DateOfBirth, artist.Gender, artist.Address, artist.FirstYearRelease, artist.NumberOfAlbumsReleased)
 	if err != nil {
 		return fmt.Errorf("couldn't create artist: %v", err)
+	}
+
+	return nil
+}
+
+func (repo *ArtistRepository) DeleteArtistById(id int) error {
+	stmt, err := repo.DB.Prepare("UPDATE artists SET deleted_at = NOW() WHERE id = ?")
+	if err != nil {
+		return fmt.Errorf("couldn't prepare statement to delete artist: %v", err)
+	}
+
+	_, err = stmt.Exec(id)
+	if err != nil {
+		return fmt.Errorf("couldn't delete artist: %v", err)
+	}
+
+	return nil
+}
+
+func (repo *ArtistRepository) GetArtistById(id uint) (*model.Artist, error) {
+	var artist model.Artist
+	stmt, err := repo.DB.Prepare("SELECT * FROM artists WHERE id = ? AND deleted_at IS NULL")
+	if err != nil {
+		return nil, fmt.Errorf("failed to prepare statement: %w", err)
+	}
+	defer stmt.Close()
+
+	err = stmt.QueryRow(id).Scan(
+		&artist.ID,
+		&artist.Name,
+		&artist.DateOfBirth,
+		&artist.Gender,
+		&artist.Address,
+		&artist.FirstYearRelease,
+		&artist.NumberOfAlbumsReleased,
+		&artist.CreatedAt,
+		&artist.UpdatedAt,
+		&artist.DeletedAt,
+	)
+
+	if err != nil && err != sql.ErrNoRows {
+		return &model.Artist{}, fmt.Errorf("couldn't scan artist: %v", err)
+	}
+
+	return &artist, nil
+}
+
+func (repo *ArtistRepository) UpdateArtistById(query string, args []interface{}) error {
+	stmt, err := repo.DB.Prepare("UPDATE artists SET " + query + " WHERE id = ?")
+	if err != nil {
+		return fmt.Errorf("couldn't prepare statement to update the artist: %v", err)
+	}
+
+	_, err = stmt.Exec(args...)
+	if err != nil {
+		return fmt.Errorf("couldn't update artists: %v", err)
 	}
 
 	return nil

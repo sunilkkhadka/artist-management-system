@@ -60,3 +60,51 @@ func (handler *ArtistHandler) CreateArtist(ctx *gin.Context) {
 
 	response.SuccessResponse(ctx, "Artist created successfully")
 }
+
+func (handler *ArtistHandler) DeleteArtistById(ctx *gin.Context) {
+	id := ctx.Param("id")
+	if id == "" {
+		response.ErrorResponse(ctx, http.StatusNotFound, "artist id not found")
+		return
+	}
+
+	artistId, err := strconv.Atoi(id)
+	if err != nil {
+		response.ErrorResponse(ctx, http.StatusNotFound, "couldn't convert id to a number")
+		return
+	}
+
+	if err := handler.ArtistService.DeleteArtistById(artistId); err != nil {
+		response.ErrorResponse(ctx, http.StatusBadGateway, "cannot delete artist")
+		return
+	}
+
+	response.SuccessResponse(ctx, "Artist deleted successfully")
+}
+
+func (handler *ArtistHandler) UpdateArtistById(ctx *gin.Context) {
+	var updateArtist request.UpdateArtistRequest
+	if err := ctx.ShouldBindJSON(&updateArtist); err != nil {
+		response.ErrorResponse(ctx, http.StatusUnprocessableEntity, "required fields are empty")
+		return
+	}
+
+	id := ctx.Param("id")
+	if id == "" {
+		response.ErrorResponse(ctx, http.StatusNotFound, "artist id not found")
+		return
+	}
+
+	artistId, err := strconv.Atoi(id)
+	if err != nil {
+		response.ErrorResponse(ctx, http.StatusNotFound, "couldn't convert id to a number")
+		return
+	}
+
+	if err := handler.ArtistService.UpdateArtistById(artistId, updateArtist); err != nil {
+		response.ErrorResponse(ctx, http.StatusBadGateway, err.Error())
+		return
+	}
+
+	response.SuccessResponse(ctx, "Artist updated successfully")
+}

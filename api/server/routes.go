@@ -36,6 +36,8 @@ func ConfigureRoutes(server *Server) {
 	v1.PATCH("/user/delete/:id", userHandler.DeleteUserById)
 
 	v1.POST("/artist", middleware.RoleAccess(constants.ARTIST_MANAGER), artistHandler.CreateArtist)
+	v1.PATCH("/artist/:id", middleware.RoleAccess(constants.ARTIST_MANAGER), artistHandler.UpdateArtistById)
+	v1.PATCH("/artist/delete/:id", middleware.RoleAccess(constants.ARTIST_MANAGER), artistHandler.DeleteArtistById)
 	v1.GET("/artists", middleware.RoleAccess(constants.SUPER_ADMIN, constants.ARTIST_MANAGER), artistHandler.GetAllArtists)
 
 	v1.GET("/healthcheck", userHandler.HealthcheckHandler)

@@ -166,7 +166,6 @@ func (handler *UserHandler) GetAllUsers(ctx *gin.Context) {
 }
 
 func (handler *UserHandler) DeleteUserById(ctx *gin.Context) {
-
 	id := ctx.Param("id")
 	if id == "" {
 		response.ErrorResponse(ctx, http.StatusNotFound, "user id not found")
