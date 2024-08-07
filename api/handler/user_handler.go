@@ -24,10 +24,8 @@ func NewUserHandler(userService service.UserServiceI) *UserHandler {
 	}
 }
 
-func (handler *UserHandler) HealthcheckHandler(context *gin.Context) {
-	context.JSON(200, map[string]any{
-		"message": "Server is running..",
-	})
+func (handler *UserHandler) HealthcheckHandler(ctx *gin.Context) {
+	response.SuccessResponse(ctx, "Server is running...")
 }
 
 func (handler *UserHandler) RegisterUserHandler(context *gin.Context) {
