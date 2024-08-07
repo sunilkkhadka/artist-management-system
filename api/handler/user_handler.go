@@ -2,6 +2,7 @@ package handler
 
 import (
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -137,4 +138,30 @@ func (handler *UserHandler) LogoutHandler(ctx *gin.Context) {
 	ctx.SetCookie(constants.REFRESH_TOKEN, "", -1, "/", "localhost", false, true)
 
 	response.SuccessResponse(ctx, "Logged out successfully!")
+}
+
+func (handler *UserHandler) GetAllUsers(ctx *gin.Context) {
+	pageQuery := ctx.DefaultQuery("page", "1")
+	page, err := strconv.Atoi(pageQuery)
+	if err != nil || page < 1 {
+		response.ErrorResponse(ctx, http.StatusBadRequest, "invalid page number")
+		return
+	}
+
+	limitQuery := ctx.DefaultQuery("limit", "5")
+	limit, err := strconv.Atoi(limitQuery)
+	if err != nil || limit < 1 {
+		response.ErrorResponse(ctx, http.StatusBadRequest, "invalid limit number")
+		return
+	}
+
+	offset := (page - 1) * limit
+
+	users, err := handler.UserService.GetAllUsers(limit, offset)
+	if err != nil {
+		response.ErrorResponse(ctx, http.StatusNotFound, err.Error())
+		return
+	}
+
+	response.SuccessResponse(ctx, response.CreateUsersCollectionResponse(users))
 }

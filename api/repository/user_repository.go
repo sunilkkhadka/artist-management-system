@@ -7,10 +7,12 @@ import (
 	"time"
 
 	"github.com/sunilkkhadka/artist-management-system/model"
+	"github.com/sunilkkhadka/artist-management-system/response"
 )
 
 type UserRepositoryI interface {
 	CreateUser(user *model.User) error
+	GetAllUsers(limit, offset int) ([]response.UserResponse, error)
 	GetUserByEmail(email string) (*model.User, error)
 	Logout(refreshToken string, expiresAt time.Time) error
 	GetBlacklistedTokenByToken(token string, expiresAt *time.Time) error
@@ -112,4 +114,28 @@ func (repo *UserRepository) GetBlacklistedTokenByToken(token string, expiresAt *
 	}
 
 	return nil
+}
+
+func (repo *UserRepository) GetAllUsers(limit, offset int) ([]response.UserResponse, error) {
+	stmt, err := repo.db.Prepare("SELECT * FROM users LIMIT ? OFFSET ?")
+	if err != nil {
+		return nil, fmt.Errorf("couldn't prepare statement to get all users: %v", err)
+	}
+
+	rows, err := stmt.Query(limit, offset)
+	if err != nil {
+		return nil, fmt.Errorf("couldn't query users: %v", err)
+	}
+
+	var users []response.UserResponse
+	for rows.Next() {
+		var user response.UserResponse
+		err := rows.Scan(&user.ID, &user.Firstname, &user.Lastname, &user.Email, &user.Password, &user.Role, &user.Phone, &user.DateOfBirth, &user.Gender, &user.Address, &user.CreatedAt, &user.UpdatedAt, &user.DeletedAt)
+		if err != nil {
+			return nil, fmt.Errorf("failed to scan row : %v", err)
+		}
+		users = append(users, user)
+	}
+
+	return users, nil
 }

@@ -7,16 +7,18 @@ import (
 	"github.com/sunilkkhadka/artist-management-system/model"
 	"github.com/sunilkkhadka/artist-management-system/repository"
 	"github.com/sunilkkhadka/artist-management-system/request"
+	"github.com/sunilkkhadka/artist-management-system/response"
 	"github.com/sunilkkhadka/artist-management-system/utils/auth"
 	"github.com/sunilkkhadka/artist-management-system/utils/encryption"
 	"golang.org/x/crypto/bcrypt"
 )
 
 type UserServiceI interface {
-	CreateUser(req request.RegisterUserRequest, en encryption.Encryptor) error
-	LoginUser(req request.LoginRequest) (string, string, error)
-	LogoutUser(refreshToken string, expiresAt time.Time) error
 	GetBlacklistedTokenByToken(token string) error
+	LogoutUser(refreshToken string, expiresAt time.Time) error
+	LoginUser(req request.LoginRequest) (string, string, error)
+	GetAllUsers(limit, offset int) ([]response.UserResponse, error)
+	CreateUser(req request.RegisterUserRequest, en encryption.Encryptor) error
 }
 
 type UserService struct {
@@ -109,4 +111,13 @@ func (service *UserService) LogoutUser(refreshToken string, expiresAt time.Time)
 	}
 
 	return nil
+}
+
+func (service *UserService) GetAllUsers(limit, offset int) ([]response.UserResponse, error) {
+	users, err := service.UserRepo.GetAllUsers(limit, offset)
+	if err != nil {
+		return nil, err
+	}
+
+	return users, nil
 }
