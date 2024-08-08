@@ -16,9 +16,9 @@ type CreateMusicRequest struct {
 }
 
 type UpdateMusicRequest struct {
-	ArtistId  uint         `json:"artist_id"`
-	Title     string       `json:"title"`
-	AlbumName string       `json:"album_name"`
-	Genre     string       `json:"genre"`
-	UpdatedAt sql.NullTime `json:"updated_at"`
+	ArtistId  *uint         `json:"artist_id"`
+	Title     *string       `json:"title"`
+	AlbumName *string       `json:"album_name"`
+	Genre     *string       `json:"genre"`
+	UpdatedAt *sql.NullTime `json:"updated_at"`
 }
