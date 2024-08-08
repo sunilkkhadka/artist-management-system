@@ -9,18 +9,20 @@ import (
 )
 
 func ConfigureRoutes(server *Server) {
-
 	// Repository
 	userRepo := repository.NewUserRepository(server.DB)
 	artistRepo := repository.NewArtistRepository(server.DB)
+	musicRepo := repository.NewMusicRepository(server.DB)
 
 	// Service
 	userService := service.NewUserService(userRepo)
 	artistService := service.NewArtistService(artistRepo)
+	musicService := service.NewMusicService(musicRepo)
 
 	// Handler
 	userHandler := handler.NewUserHandler(userService)
 	artistHandler := handler.NewArtistHandler(artistService)
+	musicHandler := handler.NewMusicHandler(musicService)
 
 	// Routes
 	v1 := server.Gin.Group("/v1")
@@ -39,6 +41,8 @@ func ConfigureRoutes(server *Server) {
 	v1.PATCH("/artist/:id", middleware.RoleAccess(constants.ARTIST_MANAGER), artistHandler.UpdateArtistById)
 	v1.PATCH("/artist/delete/:id", middleware.RoleAccess(constants.ARTIST_MANAGER), artistHandler.DeleteArtistById)
 	v1.GET("/artists", middleware.RoleAccess(constants.SUPER_ADMIN, constants.ARTIST_MANAGER), artistHandler.GetAllArtists)
+
+	v1.POST("/music", middleware.RoleAccess(constants.SUPER_ADMIN, constants.ARTIST, constants.ARTIST_MANAGER), musicHandler.CreateSongRecord)
 
 	v1.GET("/healthcheck", userHandler.HealthcheckHandler)
 }
