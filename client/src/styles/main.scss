@@ -3,10 +3,17 @@
 *,
 ::before,
 ::after {
-  box-sizing: border-box;
   margin: 0;
   padding: 0;
+  box-sizing: border-box;
   font-family: "Roboto", sans-serif;
+}
+
+html,
+body {
+  width: 100%;
+  height: 100%;
+  font-size: 16px;
 }
 
 a {
@@ -18,4 +25,13 @@ ul {
   list-style-type: none;
 }
 
+.wrapper {
+  width: 90%;
+  margin: 0 auto;
+}
+
 @import "./partials/variables";
+
+@import "./partials/login";
+@import "./partials/inputs";
+@import "./partials/register";

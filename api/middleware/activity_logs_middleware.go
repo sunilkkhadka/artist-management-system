@@ -48,7 +48,7 @@ func ActivityLogs(db *sql.DB) gin.HandlerFunc {
 			var user request.RegisterUserRequest
 			err := json.Unmarshal(requestData.([]byte), &user)
 			if err != nil {
-				log.Fatal("Couldn't unmarshal the data for register request")
+				log.Fatalf("Couldn't unmarshal the data for register request: %v", err)
 			}
 
 			requestData, err = json.Marshal(user)

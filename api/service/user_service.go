@@ -18,9 +18,9 @@ type UserServiceI interface {
 	DeleteUserById(id int) error
 	GetBlacklistedTokenByToken(token string) error
 	LogoutUser(refreshToken string, expiresAt time.Time) error
-	LoginUser(req request.LoginRequest) (string, string, error)
 	UpdateUserById(id int, user request.UpdateUserRequest) error
 	GetAllUsers(limit, offset int) ([]response.UserResponse, error)
+	LoginUser(req request.LoginRequest) (*model.User, string, string, error)
 	CreateUser(req request.RegisterUserRequest, en encryption.Encryptor) error
 }
 
@@ -71,37 +71,40 @@ func (service UserService) CreateUser(req request.RegisterUserRequest, en encryp
 	return nil
 }
 
-func (service *UserService) LoginUser(req request.LoginRequest) (string, string, error) {
+func (service *UserService) LoginUser(req request.LoginRequest) (*model.User, string, string, error) {
 	user, err := service.UserRepo.GetUserByEmail(req.Email)
 	if err != nil {
-		return "", "", err
+		return nil, "", "", err
 	}
 
 	if user.ID == 0 || user.DeletedAt.Valid {
-		return "", "", errors.New("user doesn't exist")
+		return nil, "", "", errors.New("user doesn't exist")
 	}
 
 	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(req.Password)); err != nil {
-		return "", "", errors.New("password doesn't match")
+		return nil, "", "", errors.New("password doesn't match")
 	}
 
 	accessToken, refreshToken, err := auth.GenerateToken(user.ID, user.Role)
 	if err != nil {
-		return "", "", err
+		return nil, "", "", err
 	}
 
-	return accessToken, refreshToken, nil
+	return user, accessToken, refreshToken, nil
 }
 
 func (service *UserService) GetBlacklistedTokenByToken(token string) error {
 	var expiresAt time.Time
 	err := service.UserRepo.GetBlacklistedTokenByToken(token, &expiresAt)
 	if err != nil {
+		if err.Error() == "token not found in the database" {
+			return nil
+		}
 		return err
 	}
 
 	if time.Now().Before(expiresAt) {
-		return errors.New("Refresh token is already expired")
+		return errors.New("refresh token is already expired")
 	}
 
 	return nil

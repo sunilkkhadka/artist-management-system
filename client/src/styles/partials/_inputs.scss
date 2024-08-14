@@ -1,0 +1,13 @@
+@import "./variables";
+
+.input-field {
+  width: 80%;
+
+  @media (min-width: $sm) {
+    width: 50%;
+  }
+
+  @media (min-width: $md) {
+    width: 50%;
+  }
+}
