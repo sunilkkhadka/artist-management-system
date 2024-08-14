@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"fmt"
 	"net/http"
 	"strconv"
 	"time"
@@ -49,7 +50,7 @@ func (handler *UserHandler) RegisterUserHandler(context *gin.Context) {
 
 	response.SuccessResponse(context, "User registered successfully")
 
-	email.SendRegisterEmail(registerRequest.Firstname, registerRequest.Email)
+	go email.SendRegisterEmail(registerRequest.Firstname, registerRequest.Email)
 }
 
 func (handler *UserHandler) LoginHandler(ctx *gin.Context) {
@@ -64,7 +65,7 @@ func (handler *UserHandler) LoginHandler(ctx *gin.Context) {
 		return
 	}
 
-	accessToken, refreshToken, err := handler.UserService.LoginUser(loginRequest)
+	user, accessToken, refreshToken, err := handler.UserService.LoginUser(loginRequest)
 	if err != nil {
 		response.ErrorResponse(ctx, http.StatusNotFound, err.Error())
 		return
@@ -73,10 +74,13 @@ func (handler *UserHandler) LoginHandler(ctx *gin.Context) {
 	ctx.SetCookie(constants.REFRESH_TOKEN, refreshToken, 60*60*24*auth.JwtConf.JwtRefreshTime, "/", "localhost", false, true)
 
 	response.SuccessResponse(ctx, map[string]any{
-		"token": accessToken,
+		"email":    user.Email,
+		"username": fmt.Sprintf("%s %s", user.Firstname, user.Lastname),
+		"role":     user.Role,
+		"token":    accessToken,
 	})
 
-	email.SendLoginEmail("User", loginRequest.Email, time.Now().Format("2006-01-02 15:04:05"), ctx.Request.UserAgent())
+	go email.SendLoginEmail(fmt.Sprintf("%s %s", user.Firstname, user.Lastname), loginRequest.Email, time.Now().Format("2006-01-02 15:04:05"), ctx.Request.UserAgent())
 }
 
 func (handler *UserHandler) RefreshHandler(ctx *gin.Context) {
@@ -88,7 +92,7 @@ func (handler *UserHandler) RefreshHandler(ctx *gin.Context) {
 
 	err = handler.UserService.GetBlacklistedTokenByToken(refreshToken)
 	if err != nil {
-		response.ErrorResponse(ctx, http.StatusUnauthorized, err.Error())
+		response.ErrorResponse(ctx, http.StatusUnauthorized, "GET BLACKLISTED TOKEN ISSUE")
 		return
 	}
 
