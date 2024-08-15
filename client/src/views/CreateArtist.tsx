@@ -1,8 +1,7 @@
-// import { useState } from "react";
-import ArtistForm from "../components/ArtistForm";
-import { initialArtistData } from "../data/artist.data";
 import { Artist } from "../types/artist.type";
+import ArtistForm from "../components/ArtistForm";
 import { useCreateArtist } from "../hooks/useArtists";
+import { initialArtistData } from "../data/artist.data";
 
 const CreateArtist = () => {
   const createArtistMutation = useCreateArtist();
@@ -13,8 +12,9 @@ const CreateArtist = () => {
 
   return (
     <ArtistForm
+      title="Create Artist"
       initialArtistData={initialArtistData}
-      handleCreateArtist={handleCreateArtist}
+      handleArtist={handleCreateArtist}
     />
   );
 };

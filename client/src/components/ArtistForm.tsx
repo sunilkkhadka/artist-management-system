@@ -2,12 +2,14 @@ import { Formik } from "formik";
 import { FButton, FInput, FSelect } from "../utils/inputs";
 
 import { genders } from "../data/edit-user.data";
+import { getDateInISOFormat } from "../utils/date";
 import { ArtistFormProps } from "../types/artist.type";
 import { artistValidation } from "../validations/artist.validation";
 
 const ArtistForm: React.FC<ArtistFormProps> = ({
+  title,
   initialArtistData,
-  handleCreateArtist,
+  handleArtist,
 }) => {
   return (
     <Formik
@@ -18,9 +20,9 @@ const ArtistForm: React.FC<ArtistFormProps> = ({
       validateOnBlur={false}
       onSubmit={(values) => {
         console.log(values);
-        handleCreateArtist({
+        handleArtist({
           ...values,
-          dob: new Date(values.dob).toISOString(),
+          dob: getDateInISOFormat(values.dob),
           first_year_release: Number(values.first_year_release),
           no_of_albums_released: Number(values.no_of_albums_released),
         });
@@ -38,7 +40,7 @@ const ArtistForm: React.FC<ArtistFormProps> = ({
         return (
           <form className="wrapper">
             <div className="">
-              <h3>Create Artist</h3>
+              <h3>{title}</h3>
               <FInput
                 title="Name *"
                 name="name"
@@ -91,7 +93,7 @@ const ArtistForm: React.FC<ArtistFormProps> = ({
               />
 
               <FButton disabled={isSubmitting} onClick={handleUpdateUser}>
-                Create Artist
+                {title}
               </FButton>
             </div>
           </form>

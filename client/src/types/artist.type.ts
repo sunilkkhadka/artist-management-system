@@ -20,6 +20,7 @@ export interface ArtistsList {
 }
 
 export interface ArtistFormProps {
+  title: string;
   initialArtistData: Artist;
-  handleCreateArtist: (artist: Artist) => void;
+  handleArtist: (artist: Artist) => void;
 }

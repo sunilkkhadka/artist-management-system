@@ -4,6 +4,7 @@ import {
   createArtist,
   fetchArtistById,
   fetchArtists,
+  updateArtistById,
 } from "../api/api.service";
 import { Artist } from "../types/artist.type";
 
@@ -28,5 +29,11 @@ export const useGetArtistById = (id: number) => {
 export const useCreateArtist = () => {
   return useMutation({
     mutationFn: (artist: Artist) => createArtist(artist),
+  });
+};
+
+export const useUpdateArtistById = () => {
+  return useMutation({
+    mutationFn: (artist: Artist) => updateArtistById(artist),
   });
 };

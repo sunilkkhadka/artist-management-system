@@ -108,3 +108,36 @@ func (handler *ArtistHandler) UpdateArtistById(ctx *gin.Context) {
 
 	response.SuccessResponse(ctx, "Artist updated successfully")
 }
+
+func (handler *ArtistHandler) GetArtistById(ctx *gin.Context) {
+	id := ctx.Param("id")
+	if id == "" {
+		response.ErrorResponse(ctx, http.StatusNotFound, "artist id not found")
+		return
+	}
+
+	artistId, err := strconv.Atoi(id)
+	if err != nil {
+		response.ErrorResponse(ctx, http.StatusNotFound, "couldn't convert id to a number")
+		return
+	}
+
+	artist, err := handler.ArtistService.GetArtistById(artistId)
+	if err != nil {
+		response.ErrorResponse(ctx, http.StatusBadGateway, err.Error())
+		return
+	}
+
+	response.SuccessResponse(ctx, response.ArtistResponse{
+		ID:                     artist.ID,
+		Name:                   artist.Name,
+		DateOfBirth:            artist.DateOfBirth,
+		Gender:                 artist.Gender,
+		Address:                artist.Address,
+		FirstYearRelease:       artist.FirstYearRelease,
+		NumberOfAlbumsReleased: artist.NumberOfAlbumsReleased,
+		CreatedAt:              artist.CreatedAt,
+		UpdatedAt:              artist.UpdatedAt,
+		DeletedAt:              artist.DeletedAt,
+	})
+}
