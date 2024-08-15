@@ -25,16 +25,18 @@ export const FButton = (props: FButtonProps) => {
 };
 
 export const FSelect = (props: FSelectProps) => {
-  const { title, name, value, handleChange } = props;
+  const { data, title, name, value, handleChange } = props;
 
   return (
     <FormGroup>
       <Label for={title}>{title}</Label>
       <select name={name} value={value} onChange={handleChange}>
         <option value="">--Please choose an option--</option>
-        <option value="m">Male</option>
-        <option value="f">Female</option>
-        <option value="o">Other</option>
+        {data?.map((option) => (
+          <option key={option.value} value={option.value}>
+            {option.label}
+          </option>
+        ))}
       </select>
     </FormGroup>
   );

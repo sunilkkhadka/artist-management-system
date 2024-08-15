@@ -3,6 +3,7 @@ import { BrowserRouter, Switch, Route, Redirect } from "react-router-dom";
 
 import * as view from "./app.view";
 import { useAuth } from "../hooks/useAuth";
+import Header from "../components/Header";
 
 interface AuthenticatedRouteProps {
   component: React.ComponentType<any>;
@@ -17,11 +18,13 @@ interface AuthenticatedRouteProps {
 const AppRoute = () => {
   return (
     <BrowserRouter>
+      <Header />
       <Switch>
-        <Route exact path="/" component={view.Login} />
+        <Route exact path="/login" component={view.Login} />
         <Route exact path="/register" component={view.Register} />
+        <Route exact path="/user/edit/:id" component={view.EditUser} />
 
-        <AuthenticatedRoute component={view.Home} path="/home" />
+        <AuthenticatedRoute component={view.Home} path="/" />
 
         <Route path="*" component={() => <h1>Page Not Found</h1>} />
       </Switch>

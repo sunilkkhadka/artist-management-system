@@ -9,15 +9,15 @@ type UserResponse struct {
 	ID          uint         `json:"id"`
 	Email       string       `json:"email"`
 	Password    string       `json:"-"`
-	Firstname   string       `json:"first_name"`
-	Lastname    string       `json:"last_name"`
+	Firstname   string       `json:"firstname"`
+	Lastname    string       `json:"lastname"`
 	Role        string       `json:"role"`
 	Phone       uint         `json:"phone"`
 	DateOfBirth time.Time    `json:"dob"`
 	Gender      string       `json:"gender"`
 	Address     string       `json:"address"`
 	CreatedAt   time.Time    `json:"created_at"`
-	UpdatedAt   time.Time    `json:"updated_at"`
+	UpdatedAt   sql.NullTime `json:"updated_at"`
 	DeletedAt   sql.NullTime `json:"deleted_at"`
 }
 

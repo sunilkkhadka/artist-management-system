@@ -12,4 +12,8 @@ export interface FButtonProps extends ButtonProps {
 export interface FSelectProps extends InputProps {
   name: string;
   title: string;
+  data: {
+    label: string;
+    value: string;
+  }[];
 }

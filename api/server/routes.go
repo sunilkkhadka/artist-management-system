@@ -34,6 +34,7 @@ func ConfigureRoutes(server *Server) {
 	// Authenticated Routes
 	v1.Use(middleware.AuthMiddleware()).Use(middleware.ActivityLogs(server.DB))
 	v1.GET("/users", userHandler.GetAllUsers)
+	v1.GET("/user/:id", userHandler.GetUserById)
 	v1.PATCH("/user/:id", userHandler.UpdateUserById)
 	v1.PATCH("/user/delete/:id", userHandler.DeleteUserById)
 

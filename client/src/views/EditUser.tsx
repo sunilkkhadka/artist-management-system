@@ -1,64 +1,64 @@
-import React from "react";
 import { Formik } from "formik";
-import { Link } from "react-router-dom";
+import { useParams } from "react-router-dom";
 
-import axios from "../api/http.api";
-import config from "../utils/config";
+import { useGetUserById } from "../hooks/useFetchUsers";
+import { FButton, FInput, FSelect } from "../utils/inputs";
 
-import { FInput, FButton, FSelect } from "../utils/inputs";
-import { registerInitialData } from "../data/register.data";
-import { registrationValidation } from "../validations/registration.validation";
-import { genders } from "../data/edit-user.data";
+import { editUserValidation } from "../validations/user.validation";
+import { genders, getInitialUserData, roles } from "../data/edit-user.data";
+import { useMutation } from "@tanstack/react-query";
+import { User } from "../types/users.type";
+import { updateUserById } from "../api/api.service";
 
-const Register = () => {
+const EditUser = () => {
+  const { id } = useParams<{ id: string }>();
+  const { data, isError, isLoading } = useGetUserById(parseInt(id));
+
+  const updateUserMutation = useMutation({
+    mutationFn: (user: User) => updateUserById(user),
+  });
+
+  if (isLoading) {
+    return <h1>Loading User Data...</h1>;
+  }
+
+  if (isError) {
+    return <h1>Something went wrong...</h1>;
+  }
+
+  const initialUserData = getInitialUserData(data);
+
+  console.log(initialUserData);
+
   return (
     <Formik
-      validationSchema={registrationValidation}
-      initialValues={registerInitialData}
+      enableReinitialize
+      validationSchema={editUserValidation}
+      initialValues={initialUserData}
+      validateOnChange={true}
+      validateOnBlur={false}
       onSubmit={(values) => {
-        console.log("API URL", config.API_URL);
-
         console.log(values);
-
-        const registerUser = async () => {
-          try {
-            const response = await axios.post(
-              "/register",
-              JSON.stringify({
-                firstname: values.firstname,
-                lastname: values.lastname,
-                email: values.email,
-                password: values.password,
-                phone: values.phone !== "" ? parseInt(values.phone) : 0,
-                dob: values.dob == "" ? "2006-01-02T15:04:05Z" : values.dob,
-                gender: values.gender,
-                address: values.address,
-              })
-            );
-
-            console.log(response);
-          } catch (err) {
-            console.log(err);
-          }
-        };
-
-        registerUser();
+        updateUserMutation.mutate(values);
       }}
     >
       {(props) => {
-        const { errors, values, handleSubmit, handleChange } = props;
+        const { errors, values, isSubmitting, handleSubmit, handleChange } =
+          props;
 
-        const handleLoginSubmit = (e: React.MouseEvent<HTMLButtonElement>) => {
+        const handleUpdateUser = (e: React.MouseEvent<HTMLButtonElement>) => {
           e.preventDefault();
 
           console.log("submitted");
           handleSubmit();
         };
 
+        console.log("VALUES", values);
+
         return (
-          <form className="register wrapper">
-            <div className="register__container">
-              <h3>Register</h3>
+          <form className="wrapper">
+            <div className="">
+              <h3>Edit User</h3>
               <FInput
                 title="First Name *"
                 name="firstname"
@@ -109,6 +109,13 @@ const Register = () => {
                 onChange={handleChange}
               />
               <FSelect
+                title="Role"
+                name="role"
+                data={roles}
+                value={values.role}
+                handleChange={handleChange}
+              />
+              <FSelect
                 title="Gender"
                 name="gender"
                 data={genders}
@@ -124,12 +131,9 @@ const Register = () => {
                 onChange={handleChange}
               />
 
-              <FButton disabled={false} onClick={handleLoginSubmit}>
-                Sign up
+              <FButton disabled={isSubmitting} onClick={handleUpdateUser}>
+                Update user
               </FButton>
-              <p>
-                Already have an account? <Link to="/">Log in</Link>
-              </p>
             </div>
           </form>
         );
@@ -138,4 +142,4 @@ const Register = () => {
   );
 };
 
-export default Register;
+export default EditUser;

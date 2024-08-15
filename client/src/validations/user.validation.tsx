@@ -1,11 +1,16 @@
 import * as Yup from "yup";
 
-export const registrationValidation = Yup.object().shape({
-  firstname: Yup.string().required("First name is required"),
-  lastname: Yup.string().required("Last name is required"),
+export const editUserValidation = Yup.object().shape({
+  firstname: Yup.string()
+    .min(3, "First name must be at least 3 characters long")
+    .max(50, "First name cannot be longer than 50 characters")
+    .required("First name is required"),
+  lastname: Yup.string()
+    .min(3, "Last name must be at least 3 characters long")
+    .max(50, "Last name cannot be longer than 50 characters")
+    .required("Last name is required"),
   email: Yup.string().email("Invalid email").required("Email is required"),
   password: Yup.string()
-    .required("Password is required")
     .min(8, "Password must be at least 8 characters")
     .matches(
       /[a-zA-Z0-9!@#$%^&*]/,

@@ -1,9 +1,28 @@
 import { client } from "./http.api";
 import routes from "../data/routes.data";
+import { User, UserList } from "../types/users.type";
 
 export const fetchUsers = async () => {
-  const response = await client.get(routes.USERS);
-  console.log("response", response);
+  const response = await client.get<UserList>(routes.USERS);
 
+  return response;
+};
+
+export const fetchUserById = async (id: number) => {
+  const response = await client.get<User>(`${routes.USER}/${id}`);
+
+  return response;
+};
+
+export const updateUserById = async (user: User) => {
+  const response = await client.patch(
+    `${routes.USER}/${user.id}`,
+    JSON.stringify(user)
+  );
+  return response;
+};
+
+export const deleteUserById = async (id: number) => {
+  const response = await client.patch(`${routes.DELETE_USER}/${id}`);
   return response;
 };

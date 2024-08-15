@@ -216,3 +216,38 @@ func (handler *UserHandler) UpdateUserById(ctx *gin.Context) {
 
 	response.SuccessResponse(ctx, "User updated successfully")
 }
+
+func (handler *UserHandler) GetUserById(ctx *gin.Context) {
+	id := ctx.Param("id")
+	if id == "" {
+		response.ErrorResponse(ctx, http.StatusNotFound, "user id not found")
+		return
+	}
+
+	userId, err := strconv.Atoi(id)
+	if err != nil {
+		response.ErrorResponse(ctx, http.StatusNotFound, "couldn't convert id to a number")
+		return
+	}
+
+	user, err := handler.UserService.GetUserById(userId)
+	if err != nil {
+		response.ErrorResponse(ctx, http.StatusBadGateway, err.Error())
+		return
+	}
+
+	response.SuccessResponse(ctx, response.UserResponse{
+		ID:          user.ID,
+		Email:       user.Email,
+		Firstname:   user.Firstname,
+		Lastname:    user.Lastname,
+		Role:        user.Role,
+		Phone:       user.Phone,
+		DateOfBirth: user.DateOfBirth,
+		Gender:      user.Gender,
+		Address:     user.Address,
+		CreatedAt:   user.CreatedAt,
+		UpdatedAt:   user.UpdatedAt,
+		DeletedAt:   user.DeletedAt,
+	})
+}
