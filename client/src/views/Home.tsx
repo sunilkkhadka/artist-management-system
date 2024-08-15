@@ -1,10 +1,11 @@
 import { useState } from "react";
 import { useGetUsers } from "../hooks/useFetchUsers";
-import { Link } from "react-router-dom";
+import { Link, NavLink } from "react-router-dom";
 import useModal from "../hooks/useModal";
 import Modal from "../components/Modal";
 import { useMutation } from "@tanstack/react-query";
-import { deleteUserById } from "../api/api.service";
+import { deleteArtistById, deleteUserById } from "../api/api.service";
+import { useGetArtists } from "../hooks/useArtists";
 
 type TabListProps = {
   name: string;
@@ -22,7 +23,7 @@ const Home = () => {
     {
       name: "Artist List",
       show: true,
-      component: <h1>Artist List Component</h1>,
+      component: <ArtistList />,
     },
   ];
 
@@ -52,6 +53,86 @@ const Tabs = ({ tabList }: { tabList: TabListProps[] }) => {
   );
 };
 
+const ArtistList = () => {
+  const { data: artistList, isLoading, isError } = useGetArtists();
+  const { isOpen, openModal, closeModal } = useModal();
+  const [currentArtist, setCurrentArtist] = useState<number>(0);
+
+  const deleteMutation = useMutation({
+    mutationFn: (id: number) => deleteArtistById(id),
+  });
+
+  if (isLoading) {
+    return <h1>Loading artist list...</h1>;
+  }
+
+  if (isError) {
+    return <h1>Something went wrong...</h1>;
+  }
+
+  const handleDelete = () => {
+    deleteMutation.mutate(currentArtist);
+    console.log("artist deleted");
+    closeModal();
+  };
+
+  return (
+    <section>
+      <h1>Artists</h1>
+      <NavLink to="/artist/create">Create New Artist</NavLink>
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Date of birth</th>
+            <th>Gender</th>
+            <th>Address</th>
+            <th>First Year Release</th>
+            <th>No. of Albums Released</th>
+            <th>Created at</th>
+            <th>Updated at</th>
+            <th>Deleted at</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {artistList?.map((artist) => (
+            <tr key={artist.id}>
+              <td>{artist.id}</td>
+              <td>{artist.name}</td>
+              <td>{artist.dob}</td>
+              <td>{artist.gender}</td>
+              <td>{artist.address}</td>
+              <td>{artist.first_year_release}</td>
+              <td>{artist.no_of_albums_released}</td>
+              <td>{artist.created_at}</td>
+              <td>{artist.updated_at?.Time}</td>
+              <td>{artist.deleted_at?.Time}</td>
+              <td>
+                <Link to={`/artist/edit/${artist.id}`}>Edit</Link>
+                <p
+                  onClick={() => {
+                    openModal();
+                    setCurrentArtist(parseInt(artist.id));
+                  }}
+                >
+                  Delete
+                </p>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      <Modal isOpen={isOpen} onClose={closeModal}>
+        <h2>Are you sure you want to delete this artist?</h2>
+        <button onClick={handleDelete}>Confirm</button>
+        <button onClick={closeModal}>Cancel</button>
+      </Modal>
+    </section>
+  );
+};
+
 const UserList = () => {
   const { data: userList } = useGetUsers();
   const { isOpen, openModal, closeModal } = useModal();
@@ -70,6 +151,7 @@ const UserList = () => {
   return (
     <section>
       <h1>Users</h1>
+      <NavLink to="/user/create">Create New User</NavLink>
       <table>
         <thead>
           <tr>

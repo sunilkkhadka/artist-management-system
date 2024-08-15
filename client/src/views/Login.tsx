@@ -50,7 +50,16 @@ const Login = () => {
               },
             });
 
-            localStorage.setItem("at", response?.data?.token);
+            localStorage.setItem(
+              "user",
+              JSON.stringify({
+                email: response?.data?.email,
+                username: response?.data?.username,
+                role: response?.data?.role,
+                token: response?.data?.token,
+                isLoggedIn: true,
+              })
+            );
 
             history.push("/home");
           } catch (err) {

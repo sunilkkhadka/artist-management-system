@@ -23,6 +23,7 @@ const AppRoute = () => {
         <Route exact path="/login" component={view.Login} />
         <Route exact path="/register" component={view.Register} />
         <Route exact path="/user/edit/:id" component={view.EditUser} />
+        <Route exact path="/artist/create" component={view.CreateArtist} />
 
         <AuthenticatedRoute component={view.Home} path="/" />
 

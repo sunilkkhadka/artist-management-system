@@ -2,12 +2,26 @@ import React, { createContext, useReducer } from "react";
 
 import { AuthState, AuthAction } from "../types/auth.type";
 
-const initialAuthState: AuthState = {
-  email: "",
-  username: "",
-  role: "",
-  token: "",
-  isLoggedIn: false,
+const initialAuthState = () => {
+  const storageUser = localStorage.getItem("user");
+  if (storageUser === null) {
+    return {
+      email: "",
+      username: "",
+      role: "",
+      token: "",
+      isLoggedIn: false,
+    };
+  }
+
+  const user = JSON.parse(storageUser);
+  return {
+    email: user?.email || "",
+    username: user?.username || "",
+    role: user?.role || "",
+    token: user?.token || "",
+    isLoggedIn: user !== "" ? true : false,
+  };
 };
 
 export const AuthContext = createContext<AuthState | null>(null);
@@ -45,7 +59,7 @@ const reducer = (state: AuthState, action: AuthAction): AuthState => {
 };
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
-  const [auth, dispatch] = useReducer(reducer, initialAuthState);
+  const [auth, dispatch] = useReducer(reducer, initialAuthState());
 
   return (
     <AuthContext.Provider value={auth}>

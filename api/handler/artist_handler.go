@@ -49,7 +49,7 @@ func (handler *ArtistHandler) GetAllArtists(ctx *gin.Context) {
 func (handler *ArtistHandler) CreateArtist(ctx *gin.Context) {
 	var createArtist request.CreateArtistRequest
 	if err := ctx.ShouldBindJSON(&createArtist); err != nil {
-		response.ErrorResponse(ctx, http.StatusUnprocessableEntity, "required fields are empty")
+		response.ErrorResponse(ctx, http.StatusUnprocessableEntity, err.Error())
 		return
 	}
 
