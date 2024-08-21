@@ -17,3 +17,19 @@ export type AuthAction =
 export type RefreshToken = {
   token: string;
 };
+
+export interface LoginProps {
+  email: string;
+  password: string;
+}
+
+export interface RegisterProps {
+  firstname: string;
+  lastname: string;
+  email: string;
+  password: string;
+  phone: string | number;
+  dob: string;
+  gender: string;
+  address: string;
+}

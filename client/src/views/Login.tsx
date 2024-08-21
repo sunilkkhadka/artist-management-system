@@ -1,18 +1,15 @@
 import React from "react";
 import { Formik } from "formik";
-import { Link, useHistory } from "react-router-dom";
+import { Link } from "react-router-dom";
 
-import { client } from "../api/http.api";
-import { LoginData } from "../data/login.data";
+import { LoginData } from "../data/auth.data";
 import { FButton, FInput } from "../utils/inputs";
 
-import { AuthState } from "../types/auth.type";
-import { useAuthDispatch } from "../hooks/useAuth";
+import { useLoginUser } from "../hooks/useAuth";
 import { loginValidation } from "../validations/login.validation";
 
 const Login = () => {
-  const history = useHistory();
-  const dispatch = useAuthDispatch();
+  const loginMutation = useLoginUser();
 
   return (
     <Formik
@@ -20,64 +17,24 @@ const Login = () => {
       initialValues={LoginData}
       validateOnChange={true}
       validateOnBlur={false}
-      onSubmit={(values) => {
-        console.log(values);
-
-        const login = async () => {
-          try {
-            const response = await client.post<AuthState>(
-              "/login",
-              JSON.stringify({
-                email: values.email,
-                password: values.password,
-              }),
-              {
-                headers: {
-                  "Content-Type": "application/json",
-                },
-                withCredentials: true,
-              }
-            );
-
-            dispatch({
-              type: "LOGIN",
-              payload: {
-                email: response?.data?.email,
-                username: response?.data?.username,
-                role: response?.data?.role,
-                token: response?.data?.token,
-                isLoggedIn: true,
-              },
-            });
-
-            localStorage.setItem(
-              "user",
-              JSON.stringify({
-                email: response?.data?.email,
-                username: response?.data?.username,
-                role: response?.data?.role,
-                token: response?.data?.token,
-                isLoggedIn: true,
-              })
-            );
-
-            history.push("/home");
-          } catch (err) {
-            console.log(err);
-          }
-        };
-
-        login();
+      onSubmit={(values, actions) => {
+        loginMutation.mutate(values);
+        actions.setSubmitting(false);
       }}
     >
       {(props) => {
-        const { errors, values, isSubmitting, handleSubmit, handleChange } =
-          props;
+        const {
+          errors,
+          values,
+          isValid,
+          isSubmitting,
+          handleSubmit,
+          handleChange,
+        } = props;
 
         const handleLoginSubmit = (e: React.MouseEvent<HTMLButtonElement>) => {
           e.preventDefault();
 
-          console.log("submitted");
           handleSubmit();
         };
 
@@ -102,11 +59,17 @@ const Login = () => {
                 onChange={handleChange}
               />
 
-              <FButton disabled={isSubmitting} onClick={handleLoginSubmit}>
+              <FButton
+                disabled={isSubmitting || !isValid}
+                onClick={handleLoginSubmit}
+              >
                 Log In
               </FButton>
-              <p>
-                Already have an account? <Link to="/register">Sign up</Link>
+              <p className="login__sign-up-link">
+                Already have an account?
+                <Link className="login__sign-up" to="/register">
+                  Sign up
+                </Link>
               </p>
             </div>
           </form>

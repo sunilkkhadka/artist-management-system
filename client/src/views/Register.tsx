@@ -2,47 +2,27 @@ import React from "react";
 import { Formik } from "formik";
 import { Link } from "react-router-dom";
 
-import axios from "../api/http.api";
-import config from "../utils/config";
-
+import { useRegisterUser } from "../hooks/useAuth";
+import { getDateInISOFormat } from "../utils/date";
 import { FInput, FButton, FSelect } from "../utils/inputs";
-import { registerInitialData } from "../data/register.data";
+
+import { genders } from "../data/user.data";
+import { registerInitialData } from "../data/auth.data";
 import { registrationValidation } from "../validations/registration.validation";
-import { genders } from "../data/edit-user.data";
 
 const Register = () => {
+  const registerMutation = useRegisterUser();
+
   return (
     <Formik
       validationSchema={registrationValidation}
       initialValues={registerInitialData}
       onSubmit={(values) => {
-        console.log("API URL", config.API_URL);
-
-        console.log(values);
-
-        const registerUser = async () => {
-          try {
-            const response = await axios.post(
-              "/register",
-              JSON.stringify({
-                firstname: values.firstname,
-                lastname: values.lastname,
-                email: values.email,
-                password: values.password,
-                phone: values.phone !== "" ? parseInt(values.phone) : 0,
-                dob: values.dob == "" ? "2006-01-02T15:04:05Z" : values.dob,
-                gender: values.gender,
-                address: values.address,
-              })
-            );
-
-            console.log(response);
-          } catch (err) {
-            console.log(err);
-          }
-        };
-
-        registerUser();
+        registerMutation.mutate({
+          ...values,
+          dob: getDateInISOFormat(values.dob),
+          phone: Number(values.phone),
+        });
       }}
     >
       {(props) => {
@@ -50,8 +30,6 @@ const Register = () => {
 
         const handleLoginSubmit = (e: React.MouseEvent<HTMLButtonElement>) => {
           e.preventDefault();
-
-          console.log("submitted");
           handleSubmit();
         };
 
@@ -127,8 +105,9 @@ const Register = () => {
               <FButton disabled={false} onClick={handleLoginSubmit}>
                 Sign up
               </FButton>
+              <br />
               <p>
-                Already have an account? <Link to="/">Log in</Link>
+                Already have an account? <Link to="/login">Log in</Link>
               </p>
             </div>
           </form>

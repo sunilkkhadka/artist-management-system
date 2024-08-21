@@ -29,6 +29,11 @@ const AppRoute = () => {
         />
         <AuthenticatedRoute
           exact
+          path="/user/create"
+          component={view.CreateUser}
+        />
+        <AuthenticatedRoute
+          exact
           path="/artist/create"
           component={view.CreateArtist}
         />
@@ -36,6 +41,17 @@ const AppRoute = () => {
           exact
           path="/artist/edit/:id"
           component={view.EditArtist}
+        />
+        <AuthenticatedRoute
+          exact
+          path="/artist/music/:artist_id"
+          component={view.MusicList}
+        />
+
+        <AuthenticatedRoute
+          exact
+          path="/music/create/:artist_id"
+          component={view.CreateMusic}
         />
 
         <AuthenticatedRoute component={view.Home} path="/" />

@@ -1,4 +1,8 @@
 const routes = {
+  LOGIN: "/login",
+  REGISTER: "/register",
+  LOGOUT: "/logout",
+
   CREATE_ARTIST: "/artist",
   ARTIST: "/artist",
   ARTISTS: "/artists",

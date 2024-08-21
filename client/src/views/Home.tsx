@@ -6,6 +6,7 @@ import Modal from "../components/Modal";
 import { useMutation } from "@tanstack/react-query";
 import { deleteArtistById, deleteUserById } from "../api/api.service";
 import { useGetArtists } from "../hooks/useArtists";
+import { useAuth } from "../hooks/useAuth";
 
 type TabListProps = {
   name: string;
@@ -14,15 +15,17 @@ type TabListProps = {
 };
 
 const Home = () => {
+  const auth = useAuth();
+
   const tabList: TabListProps[] = [
     {
       name: "User List",
-      show: true,
+      show: auth.role === "super_admin" ? true : false,
       component: <UserList />,
     },
     {
       name: "Artist List",
-      show: true,
+      show: auth.role === "artist_manager" ? false : true,
       component: <ArtistList />,
     },
   ];
@@ -79,7 +82,9 @@ const ArtistList = () => {
   return (
     <section>
       <h1>Artists</h1>
-      <NavLink to="/artist/create">Create New Artist</NavLink>
+      <NavLink className="create-new" to="/artist/create">
+        Create New Artist
+      </NavLink>
       <table>
         <thead>
           <tr>
@@ -100,7 +105,9 @@ const ArtistList = () => {
           {artistList?.map((artist) => (
             <tr key={artist.id}>
               <td>{artist.id}</td>
-              <td>{artist.name}</td>
+              <td>
+                <Link to={`/artist/music/${artist.id}`}>{artist.name}</Link>
+              </td>
               <td>{artist.dob}</td>
               <td>{artist.gender}</td>
               <td>{artist.address}</td>
@@ -144,14 +151,15 @@ const UserList = () => {
 
   const handleDelete = () => {
     deleteMutation.mutate(currentUser);
-    console.log("User deleted");
     closeModal();
   };
 
   return (
     <section>
       <h1>Users</h1>
-      <NavLink to="/user/create">Create New User</NavLink>
+      <NavLink className="create-new" to="/user/create">
+        Create New User
+      </NavLink>
       <table>
         <thead>
           <tr>

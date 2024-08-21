@@ -1,25 +1,61 @@
-import { Link } from "react-router-dom";
+import { useEffect } from "react";
+import { CgProfile } from "react-icons/cg";
+import { Link, useHistory } from "react-router-dom";
+
+import { useAuth, useLogout } from "../hooks/useAuth";
 
 const Header = () => {
-  // const dispatch = useAuthDispatch()
+  const auth = useAuth();
+  const history = useHistory();
+  const logoutMutation = useLogout();
 
-  // useEffect(() => {
-  //   if (localStorage.getItem("at")) {
-  //     dispatch({
-  //       type: "LOGIN",
-  //       payload
-  //     })
-  //   }
-  // }, [])
+  useEffect(() => {
+    if (!auth.isLoggedIn) {
+      history.push("/login");
+    }
+  }, [auth.isLoggedIn, history]);
+
+  const handleLogout = () => {
+    logoutMutation.mutate();
+  };
 
   return (
-    <header>
-      <nav>
-        <h1>Melodia</h1>
-        <ul>
-          <li>
-            <Link to="/logout">Logout</Link>
-          </li>
+    <header className="header">
+      <nav className="header__nav">
+        <Link to="/" className="header__logo">
+          Melodia
+        </Link>
+        <ul className="header__nav-links">
+          {auth.isLoggedIn && (
+            <>
+              <li className="header__profile">
+                <CgProfile className="header__profile-icon" /> {auth.username}
+              </li>
+              <li>
+                <Link
+                  to="/logout"
+                  className="header__logout-btn"
+                  onClick={handleLogout}
+                >
+                  Logout
+                </Link>
+              </li>
+            </>
+          )}
+          {!auth.isLoggedIn && (
+            <>
+              <li>
+                <Link to="#" className="header__logout-btn">
+                  Login
+                </Link>
+              </li>
+              <li>
+                <Link to="/register" className="header__logout-btn">
+                  Register
+                </Link>
+              </li>
+            </>
+          )}
         </ul>
       </nav>
     </header>

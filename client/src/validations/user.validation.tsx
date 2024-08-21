@@ -1,6 +1,6 @@
 import * as Yup from "yup";
 
-export const editUserValidation = Yup.object().shape({
+export const userValidation = Yup.object().shape({
   firstname: Yup.string()
     .min(3, "First name must be at least 3 characters long")
     .max(50, "First name cannot be longer than 50 characters")

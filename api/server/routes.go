@@ -33,10 +33,11 @@ func ConfigureRoutes(server *Server) {
 
 	// Authenticated Routes
 	v1.Use(middleware.AuthMiddleware()).Use(middleware.ActivityLogs(server.DB))
-	v1.GET("/users", userHandler.GetAllUsers)
-	v1.GET("/user/:id", userHandler.GetUserById)
-	v1.PATCH("/user/:id", userHandler.UpdateUserById)
-	v1.PATCH("/user/delete/:id", userHandler.DeleteUserById)
+	v1.GET("/users", middleware.RoleAccess(constants.SUPER_ADMIN), userHandler.GetAllUsers)
+	v1.GET("/user/:id", middleware.RoleAccess(constants.SUPER_ADMIN), userHandler.GetUserById)
+	v1.POST("/user", middleware.RoleAccess(constants.SUPER_ADMIN), userHandler.CreateUser)
+	v1.PATCH("/user/:id", middleware.RoleAccess(constants.SUPER_ADMIN), userHandler.UpdateUserById)
+	v1.PATCH("/user/delete/:id", middleware.RoleAccess(constants.SUPER_ADMIN), userHandler.DeleteUserById)
 
 	v1.POST("/artist", middleware.RoleAccess(constants.ARTIST_MANAGER), artistHandler.CreateArtist)
 	v1.GET("/artist/:id", middleware.RoleAccess(constants.ARTIST_MANAGER), artistHandler.GetArtistById)

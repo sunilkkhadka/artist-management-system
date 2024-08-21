@@ -1,7 +1,7 @@
 import { Formik } from "formik";
 import { FButton, FInput, FSelect } from "../utils/inputs";
 
-import { genders } from "../data/edit-user.data";
+import { genders } from "../data/user.data";
 import { getDateInISOFormat } from "../utils/date";
 import { ArtistFormProps } from "../types/artist.type";
 import { artistValidation } from "../validations/artist.validation";

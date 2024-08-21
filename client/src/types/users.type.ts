@@ -9,7 +9,7 @@ export interface User {
   dob: string;
   gender: string;
   address: string;
-  created_at: string;
+  created_at?: string;
   updated_at?: {
     Time: string;
   };
@@ -20,4 +20,10 @@ export interface User {
 
 export interface UserList {
   collection: User[];
+}
+
+export interface UserFormProps {
+  title: string;
+  initialUserData: User;
+  handleUser: (user: User) => void;
 }

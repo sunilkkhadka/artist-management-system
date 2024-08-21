@@ -40,7 +40,7 @@ func (repo *MusicRepository) CreateMusic(music model.Music) error {
 }
 
 func (repo *MusicRepository) GetAllMusics(artist_id, limit, offset int) ([]model.Music, error) {
-	stmt, err := repo.DB.Prepare("SELECT * FROM musics WHERE artist_id = ? AND deleted_at IS NULL LIMIT ? OFFSET ?")
+	stmt, err := repo.DB.Prepare("SELECT musics.id, musics.artist_id, musics.title, musics.album_name, musics.genre, artists.name, musics.created_at, musics.updated_at, musics.deleted_at FROM musics INNER JOIN musics.artist_id ON artist.id WHERE artist_id = ? AND deleted_at IS NULL LIMIT ? OFFSET ?")
 	if err != nil {
 		return nil, fmt.Errorf("couldn't prepare statement to get all musics: %v", err)
 	}
@@ -52,12 +52,12 @@ func (repo *MusicRepository) GetAllMusics(artist_id, limit, offset int) ([]model
 
 	var musics []model.Music
 	for rows.Next() {
-		var user model.Music
-		err := rows.Scan(&user.ID, &user.ArtistId, &user.Title, &user.AlbumName, &user.Genre, &user.CreatedAt, &user.UpdatedAt, &user.DeletedAt)
+		var music model.Music
+		err := rows.Scan(&music.ID, &music.ArtistId, &music.Title, &music.AlbumName, &music.Genre, &music.ArtistName, &music.CreatedAt, &music.UpdatedAt, &music.DeletedAt)
 		if err != nil {
 			return nil, fmt.Errorf("failed to scan row : %v", err)
 		}
-		musics = append(musics, user)
+		musics = append(musics, music)
 	}
 
 	return musics, nil

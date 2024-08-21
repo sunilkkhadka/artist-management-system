@@ -7,7 +7,6 @@ export const FInput = (props: FInputProps) => {
 
   return (
     <FormGroup className="input-field">
-      {/* <FormGroup className="position-relative"> */}
       <Label for={title}>{title}</Label>
       <Input invalid={error ? true : false} autoComplete="off" {...rest} />
       {error && <FormFeedback invalid>{error}</FormFeedback>}
@@ -29,7 +28,9 @@ export const FSelect = (props: FSelectProps) => {
 
   return (
     <FormGroup>
-      <Label for={title}>{title}</Label>
+      <Label className="select-label" for={title}>
+        {title}
+      </Label>
       <select name={name} value={value} onChange={handleChange}>
         <option value="">--Please choose an option--</option>
         {data?.map((option) => (

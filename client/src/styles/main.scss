@@ -30,8 +30,27 @@ ul {
   margin: 0 auto;
 }
 
+table {
+  border: 1px solid rgb(210, 210, 210);
+  width: 100%;
+  padding: 1rem;
+  margin: 1rem;
+}
+
+thead {
+  border-bottom: 1px solid rgb(207, 207, 207);
+}
+
+.create-new {
+  padding: 0.5rem 1rem;
+  background-color: rgb(85, 128, 255);
+  color: white;
+  margin-left: 1rem;
+}
+
 @import "./partials/variables";
 
 @import "./partials/login";
+@import "./partials/header";
 @import "./partials/inputs";
 @import "./partials/register";

@@ -39,12 +39,12 @@ func (handler *UserHandler) RegisterUserHandler(context *gin.Context) {
 	}
 
 	if err := registerRequest.Validate(); err != nil {
-		response.ErrorResponse(context, http.StatusUnprocessableEntity, err.Error())
+		response.ErrorResponse(context, http.StatusUnauthorized, err.Error())
 		return
 	}
 
 	if err := handler.UserService.CreateUser(registerRequest, encryption.NewBcryptEncoder(bcrypt.DefaultCost)); err != nil {
-		response.ErrorResponse(context, http.StatusUnprocessableEntity, err.Error())
+		response.ErrorResponse(context, http.StatusConflict, err.Error())
 		return
 	}
 
@@ -250,4 +250,8 @@ func (handler *UserHandler) GetUserById(ctx *gin.Context) {
 		UpdatedAt:   user.UpdatedAt,
 		DeletedAt:   user.DeletedAt,
 	})
+}
+
+func (handler *UserHandler) CreateUser(ctx *gin.Context) {
+	handler.RegisterUserHandler((ctx))
 }

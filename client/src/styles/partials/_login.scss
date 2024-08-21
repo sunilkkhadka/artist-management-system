@@ -1,5 +1,5 @@
 .login {
-  height: 100vh;
+  margin-top: 10rem;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -14,5 +14,13 @@
     @media (min-width: $lg) {
       width: 70%;
     }
+  }
+
+  &__sign-up {
+    text-decoration: underline;
+  }
+
+  &__sign-up-link {
+    padding-top: 1rem;
   }
 }
