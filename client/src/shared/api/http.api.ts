@@ -1,6 +1,6 @@
 import axios from "axios";
 import config from "../utils/config";
-import { RefreshToken } from "../types/auth.type";
+import { RefreshToken } from "../../features/auth/auth.type";
 
 export default axios.create({
   baseURL: config.API_URL,
