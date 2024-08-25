@@ -39,12 +39,12 @@ func (handler *UserHandler) RegisterUserHandler(context *gin.Context) {
 	}
 
 	if err := registerRequest.Validate(); err != nil {
-		response.ErrorResponse(context, http.StatusUnprocessableEntity, err.Error())
+		response.ErrorResponse(context, http.StatusUnauthorized, err.Error())
 		return
 	}
 
 	if err := handler.UserService.CreateUser(registerRequest, encryption.NewBcryptEncoder(bcrypt.DefaultCost)); err != nil {
-		response.ErrorResponse(context, http.StatusUnprocessableEntity, err.Error())
+		response.ErrorResponse(context, http.StatusConflict, err.Error())
 		return
 	}
 
@@ -71,7 +71,7 @@ func (handler *UserHandler) LoginHandler(ctx *gin.Context) {
 		return
 	}
 
-	ctx.SetCookie(constants.REFRESH_TOKEN, refreshToken, 60*60*24*auth.JwtConf.JwtRefreshTime, "/", "localhost", false, true)
+	ctx.SetCookie(constants.REFRESH_TOKEN, refreshToken, 60*60*24*auth.JwtConf.JwtRefreshTime, "/", "", false, true)
 
 	response.SuccessResponse(ctx, map[string]any{
 		"email":    user.Email,
@@ -144,14 +144,14 @@ func (handler *UserHandler) LogoutHandler(ctx *gin.Context) {
 }
 
 func (handler *UserHandler) GetAllUsers(ctx *gin.Context) {
-	pageQuery := ctx.DefaultQuery("page", "1")
+	pageQuery := ctx.Query("page")
 	page, err := strconv.Atoi(pageQuery)
 	if err != nil || page < 1 {
 		response.ErrorResponse(ctx, http.StatusBadRequest, "invalid page number")
 		return
 	}
 
-	limitQuery := ctx.DefaultQuery("limit", "5")
+	limitQuery := ctx.Query("per_page")
 	limit, err := strconv.Atoi(limitQuery)
 	if err != nil || limit < 1 {
 		response.ErrorResponse(ctx, http.StatusBadRequest, "invalid limit number")
@@ -215,4 +215,43 @@ func (handler *UserHandler) UpdateUserById(ctx *gin.Context) {
 	}
 
 	response.SuccessResponse(ctx, "User updated successfully")
+}
+
+func (handler *UserHandler) GetUserById(ctx *gin.Context) {
+	id := ctx.Param("id")
+	if id == "" {
+		response.ErrorResponse(ctx, http.StatusNotFound, "user id not found")
+		return
+	}
+
+	userId, err := strconv.Atoi(id)
+	if err != nil {
+		response.ErrorResponse(ctx, http.StatusNotFound, "couldn't convert id to a number")
+		return
+	}
+
+	user, err := handler.UserService.GetUserById(userId)
+	if err != nil {
+		response.ErrorResponse(ctx, http.StatusBadGateway, err.Error())
+		return
+	}
+
+	response.SuccessResponse(ctx, response.UserResponse{
+		ID:          user.ID,
+		Email:       user.Email,
+		Firstname:   user.Firstname,
+		Lastname:    user.Lastname,
+		Role:        user.Role,
+		Phone:       user.Phone,
+		DateOfBirth: user.DateOfBirth,
+		Gender:      user.Gender,
+		Address:     user.Address,
+		CreatedAt:   user.CreatedAt,
+		UpdatedAt:   user.UpdatedAt,
+		DeletedAt:   user.DeletedAt,
+	})
+}
+
+func (handler *UserHandler) CreateUser(ctx *gin.Context) {
+	handler.RegisterUserHandler((ctx))
 }

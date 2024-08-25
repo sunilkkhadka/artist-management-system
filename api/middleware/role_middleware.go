@@ -24,6 +24,6 @@ func RoleAccess(allowedRoles ...string) gin.HandlerFunc {
 			}
 		}
 
-		response.ErrorResponse(ctx, http.StatusUnauthorized, "User is not allowed to access this role")
+		response.ErrorResponse(ctx, http.StatusForbidden, "User is not allowed to access this role")
 	}
 }

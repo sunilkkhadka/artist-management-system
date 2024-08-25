@@ -2,46 +2,27 @@ import React from "react";
 import { Formik } from "formik";
 import { Link } from "react-router-dom";
 
-import axios from "../api/http.api";
-import config from "../utils/config";
-
+import { useRegisterUser } from "../hooks/useAuth";
+import { getDateInISOFormat } from "../utils/date";
 import { FInput, FButton, FSelect } from "../utils/inputs";
-import { registerInitialData } from "../data/register.data";
+
+import { genders } from "../data/user.data";
+import { registerInitialData } from "../data/auth.data";
 import { registrationValidation } from "../validations/registration.validation";
 
 const Register = () => {
+  const registerMutation = useRegisterUser();
+
   return (
     <Formik
       validationSchema={registrationValidation}
       initialValues={registerInitialData}
       onSubmit={(values) => {
-        console.log("API URL", config.API_URL);
-
-        console.log(values);
-
-        const registerUser = async () => {
-          try {
-            const response = await axios.post(
-              "/register",
-              JSON.stringify({
-                first_name: values.firstName,
-                last_name: values.lastName,
-                email: values.email,
-                password: values.password,
-                phone: values.phone !== "" ? parseInt(values.phone) : 0,
-                dob: values.dob == "" ? "2006-01-02T15:04:05Z" : values.dob,
-                gender: values.gender,
-                address: values.address,
-              })
-            );
-
-            console.log(response);
-          } catch (err) {
-            console.log(err);
-          }
-        };
-
-        registerUser();
+        registerMutation.mutate({
+          ...values,
+          dob: getDateInISOFormat(values.dob),
+          phone: Number(values.phone),
+        });
       }}
     >
       {(props) => {
@@ -49,8 +30,6 @@ const Register = () => {
 
         const handleLoginSubmit = (e: React.MouseEvent<HTMLButtonElement>) => {
           e.preventDefault();
-
-          console.log("submitted");
           handleSubmit();
         };
 
@@ -60,17 +39,17 @@ const Register = () => {
               <h3>Register</h3>
               <FInput
                 title="First Name *"
-                name="firstName"
-                value={values.firstName}
-                error={errors.firstName}
+                name="firstname"
+                value={values.firstname}
+                error={errors.firstname}
                 type="text"
                 onChange={handleChange}
               />
               <FInput
                 title="Last Name *"
-                name="lastName"
-                value={values.lastName}
-                error={errors.lastName}
+                name="lastname"
+                value={values.lastname}
+                error={errors.lastname}
                 type="text"
                 onChange={handleChange}
               />
@@ -102,14 +81,15 @@ const Register = () => {
               <FInput
                 title="Date Of Birth *"
                 name="dob"
-                value={values.lastName}
-                error={errors.lastName}
+                value={values.dob}
+                error={errors.dob}
                 type="date"
                 onChange={handleChange}
               />
               <FSelect
                 title="Gender"
                 name="gender"
+                data={genders}
                 value={values.gender}
                 handleChange={handleChange}
               />
@@ -125,8 +105,9 @@ const Register = () => {
               <FButton disabled={false} onClick={handleLoginSubmit}>
                 Sign up
               </FButton>
+              <br />
               <p>
-                Already have an account? <Link to="/">Log in</Link>
+                Already have an account? <Link to="/login">Log in</Link>
               </p>
             </div>
           </form>

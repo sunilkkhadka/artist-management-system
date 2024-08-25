@@ -13,6 +13,7 @@ import (
 
 type ArtistServiceI interface {
 	DeleteArtistById(id int) error
+	GetArtistById(id int) (*model.Artist, error)
 	CreateArtist(artist request.CreateArtistRequest) error
 	UpdateArtistById(id int, artist request.UpdateArtistRequest) error
 	GetAllArtists(limit, offset int) ([]response.ArtistResponse, error)
@@ -62,6 +63,15 @@ func (service *ArtistService) DeleteArtistById(id int) error {
 	}
 
 	return nil
+}
+
+func (service *ArtistService) GetArtistById(id int) (*model.Artist, error) {
+	currentArtist, err := service.ArtistRepo.GetArtistById(uint(id))
+	if err != nil {
+		return nil, err
+	}
+
+	return currentArtist, nil
 }
 
 func (service *ArtistService) UpdateArtistById(id int, artist request.UpdateArtistRequest) error {

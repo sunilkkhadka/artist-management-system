@@ -3,6 +3,7 @@ import { BrowserRouter, Switch, Route, Redirect } from "react-router-dom";
 
 import * as view from "./app.view";
 import { useAuth } from "../hooks/useAuth";
+import Header from "../components/Header";
 
 interface AuthenticatedRouteProps {
   component: React.ComponentType<any>;
@@ -15,13 +16,51 @@ interface AuthenticatedRouteProps {
 }
 
 const AppRoute = () => {
+  const auth = useAuth();
+
   return (
     <BrowserRouter>
+      <Header />
       <Switch>
-        <Route exact path="/" component={view.Login} />
+        <Route exact path="/login" component={view.Login} />
         <Route exact path="/register" component={view.Register} />
+        <AuthenticatedRoute
+          exact
+          path="/user/edit/:id"
+          component={view.EditUser}
+        />
+        <AuthenticatedRoute
+          exact
+          path="/user/create"
+          component={view.CreateUser}
+        />
+        <AuthenticatedRoute
+          exact
+          path="/artist/create"
+          component={view.CreateArtist}
+        />
+        <AuthenticatedRoute
+          exact
+          path="/artist/edit/:id"
+          component={view.EditArtist}
+        />
+        <AuthenticatedRoute
+          exact
+          path="/artist/music/:artist_id"
+          component={view.MusicList}
+        />
 
-        <AuthenticatedRoute component={view.Home} path="/home" />
+        <AuthenticatedRoute
+          exact
+          path="/music/create/:artist_id"
+          component={view.CreateMusic}
+        />
+
+        {auth.role != "artist" ? (
+          <AuthenticatedRoute component={view.Home} path="/" />
+        ) : (
+          <AuthenticatedRoute component={view.MusicList} path="/" />
+        )}
 
         <Route path="*" component={() => <h1>Page Not Found</h1>} />
       </Switch>

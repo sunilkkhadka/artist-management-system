@@ -15,6 +15,7 @@ import (
 )
 
 type UserServiceI interface {
+	GetUserById(id int) (*model.User, error)
 	DeleteUserById(id int) error
 	GetBlacklistedTokenByToken(token string) error
 	LogoutUser(refreshToken string, expiresAt time.Time) error
@@ -137,6 +138,15 @@ func (service *UserService) DeleteUserById(id int) error {
 	return nil
 }
 
+func (service *UserService) GetUserById(id int) (*model.User, error) {
+	user, err := service.UserRepo.GetUserById(uint(id))
+	if err != nil {
+		return nil, err
+	}
+
+	return user, nil
+}
+
 func (service *UserService) UpdateUserById(id int, user request.UpdateUserRequest) error {
 	currentUser, err := service.UserRepo.GetUserById(uint(id))
 	if err != nil {
@@ -170,7 +180,7 @@ func (service *UserService) UpdateUserById(id int, user request.UpdateUserReques
 		if err != nil {
 			return err
 		}
-		query = append(query, "password = ?")
+		query = append(query, "password_hash = ?")
 		args = append(args, hashedPassword)
 	}
 

@@ -1,4 +1,5 @@
 @import url("https://fonts.googleapis.com/css2?family=Roboto:wght@300&display=swap");
+@import "./partials/variables";
 
 *,
 ::before,
@@ -14,6 +15,7 @@ body {
   width: 100%;
   height: 100%;
   font-size: 16px;
+  background-color: rgb(242, 242, 242);
 }
 
 a {
@@ -30,8 +32,201 @@ ul {
   margin: 0 auto;
 }
 
-@import "./partials/variables";
+table {
+  border: 1px solid rgb(210, 210, 210);
+  width: 100%;
+  padding: 1rem;
+  margin: 1rem;
+}
 
+thead {
+  border-bottom: 1px solid rgb(207, 207, 207);
+}
+
+.export {
+  height: fit-content;
+  font-size: 0.9rem;
+}
+
+.action-icons {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+
+  &__edit {
+    font-size: 1.2rem;
+    color: $primaryColor;
+  }
+
+  &__delete {
+    font-size: 1.2rem;
+    color: tomato;
+    cursor: pointer;
+  }
+}
+
+.create-new {
+  height: fit-content;
+  text-align: center;
+  padding: 0.4rem 0.5rem;
+  border: 1px solid #d4d4d4;
+  background-color: #f7f7f7;
+  border-radius: 0.5rem;
+  color: #363636;
+  font-size: 0.9rem;
+
+  &:hover {
+    border: 1px solid #bdbdbd;
+    background-color: #faf9f9;
+    color: #363636;
+  }
+}
+
+.modal-info {
+  padding: 2rem;
+
+  p {
+    text-align: center;
+    font-size: 1.2rem;
+  }
+
+  &__actions {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+  }
+
+  &__confirm {
+    background-color: $primaryColor;
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+  }
+
+  &__cancel {
+    color: rgb(47, 47, 47);
+    border: 1px solid #c3c3c3;
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+  }
+}
+
+.list-layout {
+  &__intro {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    h1 {
+      font-weight: 700;
+      padding-top: 1rem;
+      font-size: 1.9rem;
+      color: #3f3f3f;
+    }
+  }
+
+  &__date {
+    font-size: 0.9rem;
+    color: #4e4e4e;
+  }
+
+  &__refresh {
+    margin-top: 0.5rem;
+    font-size: 0.8rem;
+    height: fit-content;
+    text-align: center;
+    padding: 0.1rem 0.5rem;
+    border: 1px solid #7a86e4;
+    background-color: rgb(237, 241, 255);
+    border-radius: 0.5rem;
+    color: #363636;
+    cursor: pointer;
+
+    &:hover {
+      border: 1px solid #bdbdbd;
+      background-color: #faf9f9;
+      color: #363636;
+    }
+  }
+}
+
+.form-container {
+  background-color: white;
+  width: 95%;
+  margin: 2rem auto;
+  padding-bottom: 2rem;
+  box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
+}
+
+.form-layout {
+  width: 90%;
+  margin: 0 auto;
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(2, 1fr);
+
+  div {
+    width: 100%;
+  }
+}
+
+.form-btn {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+}
+
+.form-intro {
+  width: 90%;
+  margin: 0 auto;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  padding: 1rem 0;
+  margin-bottom: 1rem;
+  border-bottom: 1px solid rgb(210, 210, 210);
+
+  h1 {
+    flex: 1;
+    font-size: 2rem;
+    text-align: center;
+  }
+
+  .back-btn {
+    width: 90%;
+    flex: 0;
+    margin: 0.5rem auto;
+
+    button {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 0.2rem;
+      margin-top: 0.5rem;
+      border: 1px solid #7a86e4;
+      font-size: 0.9rem;
+      height: fit-content;
+      text-align: center;
+      padding: 0.3em 0.5rem;
+      background-color: rgb(237, 241, 255);
+      border-radius: 0.5rem;
+      color: #363636;
+      cursor: pointer;
+
+      &:hover {
+        background-color: #faf9f9;
+        color: #363636;
+      }
+    }
+  }
+}
+
+@import "./partials/tabs";
+@import "./partials/home";
 @import "./partials/login";
+@import "./partials/header";
 @import "./partials/inputs";
 @import "./partials/register";

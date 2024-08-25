@@ -10,8 +10,8 @@ import (
 type UpdateUserRequest struct {
 	Email       *string    `json:"email"`
 	Password    *string    `json:"password"`
-	Firstname   *string    `json:"first_name"`
-	Lastname    *string    `json:"last_name"`
+	Firstname   *string    `json:"firstname"`
+	Lastname    *string    `json:"lastname"`
 	Role        *string    `json:"role"`
 	Phone       *uint      `json:"phone"`
 	DateOfBirth *time.Time `json:"dob"`

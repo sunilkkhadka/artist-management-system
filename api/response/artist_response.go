@@ -24,6 +24,7 @@ func CreateArtistsCollectionResponse(artists []ArtistResponse) CollectionRespons
 	for index := range artists {
 		collection = append(collection, ArtistResponse{
 			ID:                     artists[index].ID,
+			Name:                   artists[index].Name,
 			DateOfBirth:            artists[index].DateOfBirth,
 			Gender:                 artists[index].Gender,
 			Address:                artists[index].Address,

@@ -1,15 +1,77 @@
+import React, { useState } from "react";
 import { useAuth } from "../hooks/useAuth";
-import { useGetUsers } from "../hooks/useFetchUsers";
+
+import UserList from "../components/UserList";
+import ArtistList from "../components/ArtistList";
+
+type TabListProps = {
+  name: string;
+  show: boolean;
+  component: React.ReactElement;
+};
 
 const Home = () => {
-  const { data } = useGetUsers();
-
   const auth = useAuth();
-  console.log(auth);
 
-  console.log(data);
+  const tabList: TabListProps[] = [
+    {
+      name: "User List",
+      show: auth.role === "super_admin" ? true : false,
+      component: <UserList />,
+    },
+    {
+      name: "Artist List",
+      show:
+        auth.role === "artist_manager" || auth.role === "super_admin"
+          ? true
+          : false,
+      component: <ArtistList />,
+    },
+  ];
 
-  return <div>Home</div>;
+  return (
+    <main className="home">
+      <section className="home__container">
+        <Tabs tabList={tabList} />
+      </section>
+    </main>
+  );
+};
+
+const Tabs = ({ tabList }: { tabList: TabListProps[] }) => {
+  const [activeTab, setActiveTab] = useState<TabListProps>(
+    tabList.filter((tab) => tab.show)[0]
+  );
+
+  const handleActiveTab = (tab: TabListProps) => {
+    setActiveTab(tab);
+  };
+
+  return (
+    <>
+      <div className="tabs">
+        <ul className="tabs__list">
+          {tabList.map(
+            (tab) =>
+              tab.show && (
+                <li
+                  className={`${
+                    activeTab.name === tab.name
+                      ? "tabs__item active"
+                      : "tabs__item"
+                  }`}
+                  key={tab.name}
+                  onClick={() => handleActiveTab(tab)}
+                >
+                  {tab.name}
+                </li>
+              )
+          )}
+        </ul>
+      </div>
+      {activeTab?.component ? activeTab.component : ""}
+    </>
+  );
 };
 
 export default Home;

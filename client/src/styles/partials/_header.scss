@@ -1,0 +1,43 @@
+.header {
+  background-color: $primaryColor;
+  padding: 1rem 3rem;
+
+  &__nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  &__logo {
+    color: white;
+    font-weight: bold;
+    font-size: 1.5rem;
+  }
+
+  &__nav-links {
+    display: flex;
+    gap: 3rem;
+    color: white;
+  }
+
+  &__profile {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: center;
+    align-items: center;
+
+    &-icon {
+      font-size: 1.5rem;
+    }
+  }
+
+  &__logout-btn {
+    border: 1px solid white;
+    color: white;
+    padding: 0.5rem 1rem;
+
+    &:hover {
+      background-color: rgb(62, 99, 211);
+    }
+  }
+}

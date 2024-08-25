@@ -19,7 +19,7 @@ export const client = axios.create({
 
 client.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem("at");
+    const token = getTokenFromStorage();
     if (!config.headers.Authorization) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -36,7 +36,7 @@ client.interceptors.response.use(
     if (error?.response?.status == 403 && !originalRequest._retry) {
       originalRequest._retry = true;
       const newAccessToken = await getRefreshToken();
-      localStorage.setItem("at", newAccessToken);
+      setNewTokenInStorage(newAccessToken);
       originalRequest.headers["Authorization"] = `Bearer ${newAccessToken}`;
       return client(originalRequest);
     }
@@ -47,4 +47,25 @@ client.interceptors.response.use(
 async function getRefreshToken() {
   const response = await client.post<RefreshToken>("/refresh");
   return response?.data?.token;
+}
+
+function getTokenFromStorage() {
+  let token;
+  const storageUser = localStorage.getItem("user");
+  if (storageUser === null) {
+    token = "";
+  } else {
+    const user = JSON.parse(storageUser);
+    token = user.token;
+  }
+
+  return token;
+}
+
+function setNewTokenInStorage(newToken: string) {
+  const storageUser = localStorage.getItem("user");
+  if (storageUser === null) return;
+  const user = JSON.parse(storageUser);
+  user.token = newToken;
+  localStorage.setItem("user", JSON.stringify(user));
 }
