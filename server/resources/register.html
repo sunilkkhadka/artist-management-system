@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Welcome to Melodia</title>
+    <style>
+      a[href] {
+        color: white;
+      }
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f4f4f4;
+        margin: 0;
+        padding: 0;
+      }
+      .container {
+        max-width: 600px;
+        margin: 50px auto;
+        background-color: #ffffff;
+        padding: 20px;
+        border-radius: 8px;
+        border: 1px solid #cecece;
+      }
+      .header {
+        text-align: center;
+        padding-bottom: 20px;
+        border-bottom: 2px solid #e0e0e0;
+      }
+      .header h1 {
+        color: #28a745;
+      }
+      .content {
+        margin-top: 20px;
+      }
+      .content h2 {
+        color: #333333;
+        font-size: 24px;
+        margin-bottom: 10px;
+      }
+      .content p {
+        color: #555555;
+        font-size: 16px;
+        line-height: 1.6;
+      }
+      .button {
+        display: block;
+        width: 200px;
+        margin: 30px auto;
+        text-align: center;
+        background-color: #28a745;
+        color: #ffffff;
+        padding: 12px;
+        border-radius: 5px;
+        text-decoration: none;
+        font-size: 16px;
+      }
+      .footer {
+        text-align: center;
+        color: #888888;
+        font-size: 14px;
+        margin-top: 30px;
+        border-top: 1px solid #e0e0e0;
+        padding-top: 20px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <h1>Welcome to Melodia!</h1>
+      </div>
+      <div class="content">
+        <h2>Hi, {{.Name}}!</h2>
+        <p>
+          Thank you for registering with us. We are thrilled to have you on
+          board. Our team is dedicated to providing you with the best experience
+          possible. Feel free to explore our platform and let us know if you
+          have any questions.
+        </p>
+        <p>Click the button below to get started and explore your dashboard.</p>
+        <a href="http://localhost:5173/" class="button">Go to Dashboard</a>
+      </div>
+      <div class="footer">
+        <p>&copy; 2024 Melodia. All rights reserved.</p>
+      </div>
+    </div>
+  </body>
+</html>

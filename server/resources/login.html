@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login Alert - Melodia</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f4f4f4;
+        margin: 0;
+        padding: 0;
+      }
+      .container {
+        max-width: 600px;
+        margin: 50px auto;
+        background-color: #ffffff;
+        padding: 20px;
+        border-radius: 8px;
+        border: 1px solid #cecece;
+      }
+      .header {
+        text-align: center;
+        padding-bottom: 20px;
+        border-bottom: 2px solid #e0e0e0;
+      }
+      .header h1 {
+        color: #dc3545;
+        font-size: 28px;
+      }
+      .content {
+        margin-top: 20px;
+      }
+      .content h2 {
+        color: #333333;
+        font-size: 22px;
+        margin-bottom: 10px;
+      }
+      .content p {
+        color: #555555;
+        font-size: 16px;
+        line-height: 1.6;
+      }
+      .info {
+        background-color: #f9f9f9;
+        padding: 15px;
+        border-radius: 5px;
+        margin: 20px 0;
+        color: #333333;
+      }
+      .info p {
+        margin: 5px 0;
+        font-size: 16px;
+      }
+      .footer {
+        text-align: center;
+        color: #888888;
+        font-size: 14px;
+        margin-top: 30px;
+        border-top: 1px solid #e0e0e0;
+        padding-top: 20px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <h1>Login Alert!</h1>
+      </div>
+      <div class="content">
+        <h2>Hello, {{.Name}}!</h2>
+        <p>We noticed a new login to your account.</p>
+        <div class="info">
+          <p><strong>Time:</strong> {{.Time}}</p>
+          <p><strong>Device:</strong> {{.Device}}</p>
+          <p><strong>Email:</strong> {{.Email}}</p>
+        </div>
+        <p>
+          If this was you, no further action is needed. If you didn't log in,
+          please secure your account immediately.
+        </p>
+      </div>
+      <div class="footer">
+        <p>&copy; 2024 Melodia. All rights reserved.</p>
+      </div>
+    </div>
+  </body>
+</html>
