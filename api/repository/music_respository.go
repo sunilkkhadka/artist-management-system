@@ -40,7 +40,7 @@ func (repo *MusicRepository) CreateMusic(music model.Music) error {
 }
 
 func (repo *MusicRepository) GetAllMusics(artist_id, limit, offset int) ([]model.Music, error) {
-	stmt, err := repo.DB.Prepare("SELECT musics.id, musics.artist_id, musics.title, musics.album_name, musics.genre, artists.name, musics.created_at, musics.updated_at, musics.deleted_at FROM musics INNER JOIN musics.artist_id ON artist.id WHERE artist_id = ? AND deleted_at IS NULL LIMIT ? OFFSET ?")
+	stmt, err := repo.DB.Prepare("SELECT musics.id, musics.artist_id, musics.title, musics.album_name, musics.genre, artists.name, musics.created_at, musics.updated_at, musics.deleted_at FROM musics INNER JOIN artists ON musics.artist_id = artists.id WHERE musics.artist_id = ? AND musics.deleted_at IS NULL LIMIT ? OFFSET ?")
 	if err != nil {
 		return nil, fmt.Errorf("couldn't prepare statement to get all musics: %v", err)
 	}

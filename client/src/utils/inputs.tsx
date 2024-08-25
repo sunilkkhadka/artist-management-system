@@ -15,9 +15,15 @@ export const FInput = (props: FInputProps) => {
 };
 
 export const FButton = (props: FButtonProps) => {
-  const { disabled, children, onClick } = props;
+  const { disabled, children, className, onClick } = props;
   return (
-    <Button disabled={disabled} type="button" color="primary" onClick={onClick}>
+    <Button
+      disabled={disabled}
+      className={className}
+      type="button"
+      color="primary"
+      onClick={onClick}
+    >
       {children}
     </Button>
   );

@@ -71,7 +71,7 @@ func (handler *UserHandler) LoginHandler(ctx *gin.Context) {
 		return
 	}
 
-	ctx.SetCookie(constants.REFRESH_TOKEN, refreshToken, 60*60*24*auth.JwtConf.JwtRefreshTime, "/", "localhost", false, true)
+	ctx.SetCookie(constants.REFRESH_TOKEN, refreshToken, 60*60*24*auth.JwtConf.JwtRefreshTime, "/", "", false, true)
 
 	response.SuccessResponse(ctx, map[string]any{
 		"email":    user.Email,
@@ -144,14 +144,14 @@ func (handler *UserHandler) LogoutHandler(ctx *gin.Context) {
 }
 
 func (handler *UserHandler) GetAllUsers(ctx *gin.Context) {
-	pageQuery := ctx.DefaultQuery("page", "1")
+	pageQuery := ctx.Query("page")
 	page, err := strconv.Atoi(pageQuery)
 	if err != nil || page < 1 {
 		response.ErrorResponse(ctx, http.StatusBadRequest, "invalid page number")
 		return
 	}
 
-	limitQuery := ctx.DefaultQuery("limit", "5")
+	limitQuery := ctx.Query("per_page")
 	limit, err := strconv.Atoi(limitQuery)
 	if err != nil || limit < 1 {
 		response.ErrorResponse(ctx, http.StatusBadRequest, "invalid limit number")

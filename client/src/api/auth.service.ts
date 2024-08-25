@@ -20,6 +20,7 @@ export const login = async (loginUser: LoginProps) => {
     headers: {
       "Content-Type": "application/json",
     },
+    withCredentials: true,
   });
 
   return response;

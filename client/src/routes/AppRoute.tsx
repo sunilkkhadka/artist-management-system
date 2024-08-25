@@ -16,6 +16,8 @@ interface AuthenticatedRouteProps {
 }
 
 const AppRoute = () => {
+  const auth = useAuth();
+
   return (
     <BrowserRouter>
       <Header />
@@ -54,7 +56,11 @@ const AppRoute = () => {
           component={view.CreateMusic}
         />
 
-        <AuthenticatedRoute component={view.Home} path="/" />
+        {auth.role != "artist" ? (
+          <AuthenticatedRoute component={view.Home} path="/" />
+        ) : (
+          <AuthenticatedRoute component={view.MusicList} path="/" />
+        )}
 
         <Route path="*" component={() => <h1>Page Not Found</h1>} />
       </Switch>

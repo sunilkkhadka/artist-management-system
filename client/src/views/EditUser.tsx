@@ -1,18 +1,32 @@
-import { useParams } from "react-router-dom";
+import axios from "axios";
+import { toast } from "react-toastify";
+import { useHistory, useParams } from "react-router-dom";
 
 import { User } from "../types/users.type";
 import UserForm from "../components/UserForm";
 import { useMutation } from "@tanstack/react-query";
 import { updateUserById } from "../api/api.service";
-import { useGetUserById } from "../hooks/useFetchUsers";
 import { getInitialUserData } from "../data/user.data";
+import { useGetUserById } from "../hooks/useFetchUsers";
 
 const EditUser = () => {
+  const history = useHistory();
   const { id } = useParams<{ id: string }>();
   const { data, isError, isLoading } = useGetUserById(parseInt(id));
 
   const updateUserMutation = useMutation({
     mutationFn: (user: User) => updateUserById(user),
+    onSuccess: () => {
+      history.push("/home");
+      return toast.success("User edited successfully");
+    },
+    onError: (error) => {
+      if (axios.isAxiosError(error)) {
+        if (error.response?.status === 502) {
+          return toast.error("Couldn't update the user");
+        }
+      }
+    },
   });
 
   if (isLoading) {

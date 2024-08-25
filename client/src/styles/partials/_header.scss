@@ -1,7 +1,6 @@
 .header {
-  background-color: rgb(85, 128, 255);
-  padding: 1rem 2rem;
-  margin-bottom: 1rem;
+  background-color: $primaryColor;
+  padding: 1rem 3rem;
 
   &__nav {
     display: flex;

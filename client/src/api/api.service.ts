@@ -1,11 +1,13 @@
 import { client } from "./http.api";
 import routes from "../data/routes.data";
-import { User, UserList } from "../types/users.type";
 import { Music, MusicsList } from "../types/music.type";
+import { User, UserListProps } from "../types/users.type";
 import { Artist, ArtistsList } from "../types/artist.type";
 
-export const fetchUsers = async () => {
-  const response = await client.get<UserList>(routes.USERS);
+export const fetchUsers = async (page = 1, perPage = 5) => {
+  const response = await client.get<UserListProps>(
+    `${routes.USERS}?page=${page}&per_page=${perPage}`
+  );
 
   return response;
 };

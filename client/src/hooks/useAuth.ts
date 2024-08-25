@@ -71,7 +71,7 @@ export const useLoginUser = () => {
 
       console.log(successResponse);
 
-      history.push("/home");
+      history.push("/");
       return toast.success("Logged in successfully");
     },
     onError: (error) => {

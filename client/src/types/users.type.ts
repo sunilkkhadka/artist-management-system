@@ -18,7 +18,7 @@ export interface User {
   };
 }
 
-export interface UserList {
+export interface UserListProps {
   collection: User[];
 }
 
