@@ -2,8 +2,8 @@
 import { BrowserRouter, Switch, Route, Redirect } from "react-router-dom";
 
 import * as view from "./app.view";
-import { useAuth } from "../hooks/useAuth";
-import Header from "../components/Header";
+import Header from "../shared/components/Header";
+import { useAuth } from "../features/auth/hooks/useAuth";
 
 interface AuthenticatedRouteProps {
   component: React.ComponentType<any>;
